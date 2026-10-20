@@ -71,7 +71,7 @@ Mọi bước chạy trong một transaction:
 5. Tạo Order với trạng thái `COMPLETED`, ghi một dòng LedgerEntry `PURCHASE`, chuyển các dòng hàng sang `SOLD` và gắn orderId.
 
 ### 4.2 Mua hàng API nguồn
-1. Trong một transaction: thực hiện bước 1, 2 và 4 như mục 4.1, tạo Order `PENDING`, ghi LedgerEntry `PURCHASE`. Job pg-boss `fulfill-api-order {orderId}` được gửi sau khi transaction commit. Nếu gửi job thất bại, một tác vụ quét định kỳ (sweeper) sẽ gửi lại job cho các đơn PENDING quá 2 phút.
+1. Trong một transaction: thực hiện bước 1, 2 và 4 như mục 4.1, tạo Order `PENDING`, ghi LedgerEntry `PURCHASE`. Job pg-boss `fulfill-api-order {orderId}` được gửi sau khi transaction commit. Nếu gửi job thất bại, một tác vụ quét định kỳ (sweeper) sẽ gửi lại job cho các đơn PENDING không được cập nhật quá 10 phút (lâu hơn thời gian chờ thử lại tối đa của pg-boss là 2 phút).
 2. Worker gọi `adapter.placeOrder({ref: orderId, sku, qty})`. Mã đơn được dùng làm khóa chống trùng ở phía nguồn.
    - Thành công: trong một transaction, chèn các StockItem (`SOLD`, đã mã hóa) rồi cập nhật Order `PENDING→COMPLETED` (có điều kiện trạng thái hiện tại vẫn là PENDING).
    - Lỗi tạm thời (timeout, 5xx): pg-boss thử lại, tối đa 5 lần, thời gian chờ tăng dần.
