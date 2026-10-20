@@ -11,3 +11,5 @@ export * from './catalog';
 export * from './fulfill-queue';
 export * from './orders';
 export * from './suppliers/index';
+export * from './fulfill';
+export * from './queue';
