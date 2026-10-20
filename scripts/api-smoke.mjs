@@ -17,7 +17,7 @@ const call = async (path, init = {}) => {
 
 await call('/balance');
 const { products } = await call('/products');
-const productId = Number(productIdArg ?? products.find((p) => p.stock !== 0)?.id);
+const productId = Number(productIdArg ?? products.find((p) => p.type === 'STOCK' && p.stock > 0)?.id);
 const idem = `smoke-${Date.now()}`;
 const { order } = await call('/orders', {
   method: 'POST', headers: { 'idempotency-key': idem }, body: JSON.stringify({ productId, quantity: 1 }),
