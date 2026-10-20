@@ -1,4 +1,4 @@
-import { loadEnv } from '@web12/db';
+import { loadEnv } from '@web12/db/node';
 import { createMockSupplierServer } from './server';
 
 loadEnv();

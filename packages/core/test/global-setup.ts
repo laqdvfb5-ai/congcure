@@ -1,5 +1,5 @@
 import pg from 'pg';
-import { loadEnv, migrate } from '@web12/db';
+import { loadEnv, migrate } from '@web12/db/node';
 
 export default async function setup() {
   loadEnv();

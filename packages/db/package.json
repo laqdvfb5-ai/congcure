@@ -3,13 +3,18 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
+  "exports": {
+    ".": "./src/index.ts",
+    "./node": "./src/node.ts"
+  },
   "scripts": {
     "start": "tsx scripts/start.ts",
     "migrate": "tsx scripts/migrate.ts",
     "typecheck": "tsc -p tsconfig.json"
   },
-  "dependencies": { "pg": "^8.23.1" },
+  "dependencies": {
+    "pg": "^8.23.1"
+  },
   "devDependencies": {
     "@types/pg": "^8.23.1",
     "embedded-postgres": "18.4.0-beta.17"

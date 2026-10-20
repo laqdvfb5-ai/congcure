@@ -1,4 +1,5 @@
-import { closePool, getPool, loadEnv, migrate } from '../src/index';
+import { closePool, getPool } from '../src/index';
+import { loadEnv, migrate } from '../src/node';
 
 loadEnv();
 const applied = await migrate(getPool());

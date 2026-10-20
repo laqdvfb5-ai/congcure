@@ -1,4 +1,5 @@
-import { closePool, loadEnv } from '@web12/db';
+import { closePool } from '@web12/db';
+import { loadEnv } from '@web12/db/node';
 import {
   FULFILL_QUEUE, fulfillApiOrder, getBoss, listStalePendingOrders, stopBoss, type FulfillJobData,
 } from '@web12/core';

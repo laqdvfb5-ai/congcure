@@ -1,5 +1,6 @@
 import { afterAll, beforeEach } from 'vitest';
-import { ALL_TABLES, closePool, getPool, loadEnv } from '@web12/db';
+import { closePool, getPool } from '@web12/db';
+import { ALL_TABLES, loadEnv } from '@web12/db/node';
 
 loadEnv();
 process.env.DATABASE_URL = process.env.DATABASE_URL_TEST;
