@@ -3,11 +3,20 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json"
   },
-  "dependencies": { "@web12/db": "*" },
-  "devDependencies": { "vitest": "^5.0.5", "pg": "^8.23.1", "@types/pg": "^8.23.1" }
+  "dependencies": {
+    "@web12/db": "*"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.5",
+    "pg": "^8.23.1",
+    "@types/pg": "^8.23.1",
+    "@web12/mock-supplier": "*"
+  }
 }
