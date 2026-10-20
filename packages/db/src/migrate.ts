@@ -11,6 +11,10 @@ export const ALL_TABLES = [
 ];
 
 export async function migrate(pool: pg.Pool): Promise<string[]> {
+  const enc = await pool.query<{ server_encoding: string }>('SHOW server_encoding');
+  if (enc.rows[0]?.server_encoding !== 'UTF8') {
+    throw new Error(`Database encoding is ${enc.rows[0]?.server_encoding}; UTF8 is required for Vietnamese text`);
+  }
   await pool.query(
     `CREATE TABLE IF NOT EXISTS _migrations (name TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT now())`,
   );

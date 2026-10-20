@@ -9,6 +9,8 @@ const pg = new EmbeddedPostgres({
   password: 'postgres',
   port: 5433,
   persistent: true,
+  // Windows defaults to WIN1252, which cannot store Vietnamese text.
+  initdbFlags: ['--encoding=UTF8', '--locale=C'],
 });
 
 if (!existsSync(dataDir)) await pg.initialise();
