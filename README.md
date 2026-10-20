@@ -61,6 +61,15 @@ Header `X-API-Key: sk_...`, tạo khóa ở `/tai-khoan`. Giới hạn 60 reques
 
 Lỗi trả về dạng `{ "error": { "code", "message" } }`.
 
+## Nguồn hàng shoptaikhoan.store
+
+1. Đăng nhập shoptaikhoan.store → **Quản lý API key** → tạo key, rồi nạp tiền vào ví bên đó.
+2. Vào `/admin/nha-cung-cap` → Thêm nhà cung cấp: chọn adapter `shoptaikhoan`, để trống Base URL, dán API key.
+3. Bấm **Xem sản phẩm nguồn** để thấy ID, giá vốn và tồn kho bên nguồn.
+4. Tạo sản phẩm loại **Nguồn API**: chọn nhà cung cấp đó, điền ID vào ô "SKU bên nguồn", rồi đặt giá bán.
+
+Khi khách mua, worker gọi API nguồn (mỗi đơn có `Idempotency-Key` riêng nên không bị mua trùng) và giao tài khoản ngay. Nếu nguồn hết hàng hoặc hết số dư, đơn tự hoàn tiền và lý do hiện ở `/admin/don-hang`. Mỗi đơn tối đa 50 món, theo giới hạn của nguồn.
+
 ## Production
 
 - Đặt `DATABASE_URL` trỏ tới Postgres thật, rồi chạy `npm run db:migrate`.

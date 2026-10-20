@@ -114,7 +114,7 @@ export async function saveSupplierAction(f: FormData) {
     const id = int(f, 'id');
     const base = { name: str(f, 'name'), baseUrl: str(f, 'baseUrl'), apiKey: str(f, 'apiKey') };
     if (id) await core.updateSupplier(id, { ...base, active: f.get('active') === 'on' });
-    else await core.createSupplier(base);
+    else await core.createSupplier({ ...base, adapter: str(f, 'adapter') || undefined });
   } catch (e) { fail('/admin/nha-cung-cap', e); }
   ok('/admin/nha-cung-cap', 'Đã lưu nhà cung cấp');
 }

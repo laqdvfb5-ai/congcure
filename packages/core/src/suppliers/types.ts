@@ -17,7 +17,7 @@ export interface SupplierProduct {
 
 export interface SupplierAdapter {
   placeOrder(input: SupplierOrderInput): Promise<SupplierOrderResult>;
-  listProducts(): Promise<SupplierProduct[]>;
+  listProducts(opts?: { q?: string }): Promise<SupplierProduct[]>;
 }
 
 /** transient = worth retrying (network, timeout, 5xx, 429). */

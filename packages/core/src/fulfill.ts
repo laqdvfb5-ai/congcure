@@ -17,7 +17,9 @@ export async function fulfillApiOrder(orderId: number): Promise<FulfillOutcome> 
       throw new SupplierError('Sản phẩm chưa cấu hình nhà cung cấp', false);
     }
     const adapter = await getAdapterForSupplier(product.supplierId);
-    const result = await adapter.placeOrder({ ref: `web12-${orderId}`, sku: product.supplierSku, quantity: order.quantity });
+    // created_at makes the ref unique even if order ids restart after a database reset
+    const ref = `web12-${orderId}-${new Date(order.createdAt).getTime()}`;
+    const result = await adapter.placeOrder({ ref, sku: product.supplierSku, quantity: order.quantity });
 
     if (result.status === 'processing') throw new SupplierError('Nhà cung cấp đang xử lý', true);
     if (result.secrets.length !== order.quantity) {

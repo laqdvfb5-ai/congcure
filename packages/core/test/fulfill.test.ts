@@ -32,11 +32,13 @@ describe('fulfillApiOrder', () => {
     const { o } = await buy('netflix-1m', 2);
     expect(await fulfillApiOrder(o.id)).toBe('completed');
     const done = await getOrder(o.id);
+    // ref includes created_at so ids reused after a DB reset never collide at the supplier
+    const ref = `web12-${o.id}-${new Date(o.createdAt).getTime()}`;
     expect(done?.status).toBe('COMPLETED');
     expect(done?.supplierRef).toBeTruthy();
     expect(await getOrderSecrets(o.id)).toEqual([
-      `netflix-1m-web12-${o.id}-1@mock.local|pw1`,
-      `netflix-1m-web12-${o.id}-2@mock.local|pw2`,
+      `netflix-1m-${ref}-1@mock.local|pw1`,
+      `netflix-1m-${ref}-2@mock.local|pw2`,
     ]);
     expect(await fulfillApiOrder(o.id)).toBe('skipped');
   });

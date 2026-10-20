@@ -2,10 +2,12 @@ import { getPool } from '@web12/db';
 import { decryptSecret, encryptSecret } from '../crypto';
 import { AppError } from '../errors';
 import { createGenericRestAdapter } from './generic-rest';
+import { createShoptaikhoanAdapter, SHOPTAIKHOAN_BASE_URL } from './shoptaikhoan';
 import { SupplierError, type SupplierAdapter } from './types';
 
 export * from './types';
 export * from './generic-rest';
+export * from './shoptaikhoan';
 
 export interface Supplier {
   id: number;
@@ -16,14 +18,16 @@ export interface Supplier {
   createdAt: Date;
 }
 
-export const SUPPLIER_ADAPTERS = ['generic-rest'];
+export const SUPPLIER_ADAPTERS = ['generic-rest', 'shoptaikhoan'];
+
+const DEFAULT_BASE_URL: Record<string, string> = { shoptaikhoan: SHOPTAIKHOAN_BASE_URL };
 
 const COLS = `id, name, adapter, base_url AS "baseUrl", active, created_at AS "createdAt"`;
 
 function validate(input: { name: string; baseUrl: string; adapter?: string }) {
   const name = input.name.trim();
-  const baseUrl = input.baseUrl.trim().replace(/\/+$/, '');
   const adapter = input.adapter ?? 'generic-rest';
+  const baseUrl = (input.baseUrl.trim() || DEFAULT_BASE_URL[adapter] || '').replace(/\/+$/, '');
   if (!name) throw new AppError('INVALID_INPUT', 'Vui lòng nhập tên nhà cung cấp');
   if (!/^https?:\/\/.+/.test(baseUrl)) throw new AppError('INVALID_INPUT', 'URL phải bắt đầu bằng http:// hoặc https://');
   if (!SUPPLIER_ADAPTERS.includes(adapter)) throw new AppError('INVALID_INPUT', 'Adapter không hợp lệ');
@@ -72,6 +76,8 @@ export async function getAdapterForSupplier(id: number): Promise<SupplierAdapter
   switch (s.adapter) {
     case 'generic-rest':
       return createGenericRestAdapter({ baseUrl: s.baseUrl, apiKey: decryptSecret(s.apiKeyEnc) });
+    case 'shoptaikhoan':
+      return createShoptaikhoanAdapter({ baseUrl: s.baseUrl, apiKey: decryptSecret(s.apiKeyEnc) });
     default:
       throw new SupplierError(`Adapter không hỗ trợ: ${s.adapter}`, false);
   }
