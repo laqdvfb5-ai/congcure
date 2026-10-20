@@ -17,7 +17,7 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
           {users.map((u) => (
             <tr key={u.id}>
               <td>{u.id}</td>
-              <td>{u.email}<div className="text-xs text-gray-500">{u.name} · {u.topupCode}</div></td>
+              <td>{u.email}<div className="text-xs text-muted">{u.name} · {u.topupCode}</div></td>
               <td>{formatVnd(u.balance)}</td>
               <td>
                 <form action={setTierAction} className="flex gap-1">

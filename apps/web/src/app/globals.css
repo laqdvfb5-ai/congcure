@@ -1,11 +1,68 @@
 @import "tailwindcss";
 
+/* Dark mode follows a .dark class on <html> (set by ThemeToggle / the head script). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Palette after generaladmission.house: off-white, pure black, one red accent. */
+:root {
+  --bg: #fefefd;
+  --fg: #000000;
+  --muted: #6b6b6b;
+  --line: #d1d1d1;
+  --soft: #f3f3f1;
+  --accent: #ff0000;
+}
+.dark {
+  --bg: #0b0b0b;
+  --fg: #fefefd;
+  --muted: #9a9a9a;
+  --line: #2a2a2a;
+  --soft: #161616;
+  --accent: #ff2a2a;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-soft: var(--soft);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, monospace;
+}
+
+html { color-scheme: light; }
+html.dark { color-scheme: dark; }
+body { @apply bg-bg font-sans text-fg antialiased; }
+
 @layer components {
-  .btn { @apply inline-block rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50; }
-  .btn-secondary { @apply inline-block rounded border border-gray-300 px-4 py-2 hover:bg-gray-50; }
-  .input { @apply w-full rounded border border-gray-300 px-3 py-2; }
-  .card { @apply rounded-lg border border-gray-200 bg-white p-4; }
+  .container-x { @apply mx-auto w-full max-w-7xl px-4 md:px-8; }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-fg px-5 py-2.5 text-sm font-medium uppercase tracking-wide text-bg
+      transition-colors hover:bg-accent hover:text-white disabled:opacity-40;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-fg px-5 py-2.5 text-sm font-medium uppercase tracking-wide
+      transition-colors hover:bg-fg hover:text-bg;
+  }
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line px-4 py-1.5 text-sm transition-colors hover:border-fg;
+  }
+  .pill-active { @apply border-fg bg-fg text-bg; }
+  .badge {
+    @apply inline-flex items-center rounded-full border border-fg px-2.5 py-0.5 font-mono text-[11px] uppercase tracking-wide;
+  }
+  .price { @apply font-mono font-medium text-accent; }
+  .eyebrow { @apply font-mono text-[11px] uppercase tracking-[0.14em] text-muted; }
+  .display { @apply font-medium uppercase leading-[0.9] tracking-[-0.04em]; }
+  .input {
+    @apply w-full rounded-full border border-line bg-bg px-4 py-2.5 text-sm outline-none transition-colors placeholder:text-muted focus:border-fg;
+  }
+  textarea.input, select.input { @apply rounded-2xl; }
+  .card { @apply rounded-2xl border border-line bg-bg p-5; }
   .table { @apply w-full text-left text-sm; }
-  .table th { @apply border-b px-2 py-2 font-medium text-gray-600; }
-  .table td { @apply border-b px-2 py-2 align-top; }
+  .table th { @apply border-b border-fg px-2 py-2 font-mono text-[11px] font-normal uppercase tracking-wider text-muted; }
+  .table td { @apply border-b border-line px-2 py-3 align-top; }
+  .link { @apply underline decoration-line underline-offset-4 hover:decoration-fg; }
 }

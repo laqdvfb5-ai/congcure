@@ -9,7 +9,7 @@ export default async function NewProduct({ searchParams }: { searchParams: Promi
       <h1 className="text-xl font-semibold">Thêm sản phẩm</h1>
       <Flash searchParams={await searchParams} />
       {categories.length === 0
-        ? <p className="text-sm text-red-600">Hãy tạo danh mục trước.</p>
+        ? <p className="text-sm text-accent">Hãy tạo danh mục trước.</p>
         : <ProductForm categories={categories} suppliers={suppliers} />}
     </div>
   );

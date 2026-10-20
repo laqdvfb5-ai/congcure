@@ -16,7 +16,7 @@ export default async function AdminProducts() {
           {products.map((p) => (
             <tr key={p.id}>
               <td>{p.id}</td>
-              <td><Link href={`/admin/san-pham/${p.id}`} className="text-blue-700">{p.name}</Link></td>
+              <td><Link href={`/admin/san-pham/${p.id}`} className="link">{p.name}</Link></td>
               <td>{TYPE_LABEL[p.type]}</td>
               <td>{formatVnd(p.priceMember)} / {formatVnd(p.priceCtv)} / {formatVnd(p.priceAgent)}</td>
               <td>{p.stock ?? '∞'}</td>

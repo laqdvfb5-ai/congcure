@@ -23,7 +23,7 @@ export default async function AdminOrders({ searchParams }: { searchParams: Prom
             <tr key={o.id}>
               <td>{o.id}</td><td>#{o.userId}</td><td>{o.productName}</td><td>{o.quantity}</td><td>{formatVnd(o.total)}</td>
               <td>{o.source}</td>
-              <td>{STATUS_LABEL[o.status]}{o.error && <div className="text-xs text-red-600">{o.error}</div>}</td>
+              <td>{STATUS_LABEL[o.status]}{o.error && <div className="text-xs text-accent">{o.error}</div>}</td>
               <td>{o.attempts}</td><td>{formatDate(o.createdAt)}</td>
             </tr>
           ))}

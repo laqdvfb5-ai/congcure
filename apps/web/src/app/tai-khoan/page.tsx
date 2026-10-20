@@ -15,14 +15,14 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
     <div className="space-y-6">
       <div className="card">
         <h1 className="text-xl font-semibold">{user.name}</h1>
-        <p className="text-sm text-gray-600">{user.email} · Cấp: {TIER_LABEL[user.tier]} · Số dư: {formatVnd(user.balance)}</p>
+        <p className="text-sm text-muted">{user.email} · Cấp: {TIER_LABEL[user.tier]} · Số dư: {formatVnd(user.balance)}</p>
       </div>
 
       <div className="card space-y-3">
         <h2 className="font-semibold">Khóa API (dành cho đại lý)</h2>
         <Flash searchParams={sp} />
         {sp.newKey && (
-          <div className="rounded bg-yellow-50 p-3 text-sm">
+          <div className="rounded bg-yellow-400/15 p-3 text-sm">
             Khóa mới. Hãy lưu lại ngay, khóa sẽ không hiển thị lần nữa:
             <div className="mt-1 break-all font-mono font-semibold">{sp.newKey}</div>
           </div>
@@ -40,10 +40,10 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
                 <td className="font-mono">{k.prefix}…</td>
                 <td>{k.lastUsedAt ? formatDate(k.lastUsedAt) : '-'}</td>
                 <td>
-                  {k.revokedAt ? <span className="text-gray-400">Đã thu hồi</span> : (
+                  {k.revokedAt ? <span className="text-muted">Đã thu hồi</span> : (
                     <form action={revokeApiKeyAction}>
                       <input type="hidden" name="id" value={k.id} />
-                      <button className="text-red-600">Thu hồi</button>
+                      <button className="text-accent">Thu hồi</button>
                     </form>
                   )}
                 </td>
@@ -51,7 +51,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
             ))}
           </tbody>
         </table>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted">
           Tài liệu: gửi header <code>X-API-Key</code> tới <code>/api/v1/products</code>, <code>/api/v1/balance</code>,
           <code> POST /api/v1/orders</code> ({'{ productId, quantity }'}, header <code>Idempotency-Key</code> tùy chọn),
           <code> GET /api/v1/orders/:id</code>.
@@ -67,9 +67,9 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
               <tr key={e.id}>
                 <td>{formatDate(e.createdAt)}</td>
                 <td>{LEDGER_LABEL[e.type]}</td>
-                <td className={e.amount > 0 ? 'text-green-700' : 'text-red-600'}>{e.amount > 0 ? '+' : ''}{formatVnd(e.amount)}</td>
+                <td className={e.amount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-accent'}>{e.amount > 0 ? '+' : ''}{formatVnd(e.amount)}</td>
                 <td>{formatVnd(e.balanceAfter)}</td>
-                <td className="text-gray-500">{e.refType === 'order' ? `Đơn #${e.refId}` : e.note}</td>
+                <td className="text-muted">{e.refType === 'order' ? `Đơn #${e.refId}` : e.note}</td>
               </tr>
             ))}
           </tbody>

@@ -15,7 +15,7 @@ export default async function AdminHome() {
     <div className="grid gap-4 md:grid-cols-3">
       {tiles.map(([label, n, href]) => (
         <Link key={label} href={href} className="card block">
-          <div className="text-sm text-gray-500">{label}</div>
+          <div className="text-sm text-muted">{label}</div>
           <div className="text-3xl font-semibold">{n}</div>
         </Link>
       ))}

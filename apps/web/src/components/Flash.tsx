@@ -3,7 +3,7 @@ export function Flash({ searchParams }: { searchParams: Record<string, string | 
   const ok = typeof searchParams.ok === 'string' ? searchParams.ok : null;
   if (!error && !ok) return null;
   return (
-    <div className={`mb-4 rounded px-3 py-2 text-sm ${error ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
+    <div className={`mb-4 rounded px-3 py-2 text-sm ${error ? 'bg-accent/10 text-accent' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'}`}>
       {error ?? ok}
     </div>
   );

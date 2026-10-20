@@ -14,14 +14,14 @@ export default async function OrdersPage() {
         <tbody>
           {orders.map((o) => (
             <tr key={o.id}>
-              <td><Link href={`/don-hang/${o.id}`} className="text-blue-700">#{o.id}</Link></td>
+              <td><Link href={`/don-hang/${o.id}`} className="link">#{o.id}</Link></td>
               <td>{o.productName}</td><td>{o.quantity}</td><td>{formatVnd(o.total)}</td>
               <td>{STATUS_LABEL[o.status]}</td><td>{formatDate(o.createdAt)}</td>
             </tr>
           ))}
         </tbody>
       </table>
-      {orders.length === 0 && <p className="mt-3 text-gray-500">Chưa có đơn hàng.</p>}
+      {orders.length === 0 && <p className="mt-3 text-muted">Chưa có đơn hàng.</p>}
     </div>
   );
 }

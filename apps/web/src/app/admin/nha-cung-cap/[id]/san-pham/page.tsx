@@ -23,14 +23,14 @@ export default async function SupplierProducts({
     <div className="card space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Sản phẩm nguồn: {supplier.name}</h1>
-        <Link href="/admin/nha-cung-cap" className="text-sm text-blue-700">← Nhà cung cấp</Link>
+        <Link href="/admin/nha-cung-cap" className="text-sm link">← Nhà cung cấp</Link>
       </div>
       <form className="flex gap-2">
         <input name="q" defaultValue={q} placeholder="Tìm sản phẩm (vd: Netflix)" className="input" />
         <button className="btn-secondary">Tìm</button>
       </form>
-      {error && <div className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
-      <p className="text-xs text-gray-500">
+      {error && <div className="rounded bg-accent/10 px-3 py-2 text-sm text-accent">{error}</div>}
+      <p className="text-xs text-muted">
         Tạo sản phẩm loại API trên web, chọn nhà cung cấp này và điền cột SKU vào ô &quot;SKU bên nguồn&quot;.
       </p>
       <table className="table">
@@ -41,7 +41,7 @@ export default async function SupplierProducts({
           ))}
         </tbody>
       </table>
-      {!error && products.length === 0 && <p className="text-sm text-gray-500">Không có sản phẩm.</p>}
+      {!error && products.length === 0 && <p className="text-sm text-muted">Không có sản phẩm.</p>}
     </div>
   );
 }

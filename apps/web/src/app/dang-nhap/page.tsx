@@ -12,7 +12,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <input name="password" type="password" placeholder="Mật khẩu" required className="input" />
         <button className="btn w-full">Đăng nhập</button>
       </form>
-      <p className="mt-3 text-sm">Chưa có tài khoản? <Link href="/dang-ky" className="text-blue-700">Đăng ký</Link></p>
+      <p className="mt-3 text-sm">Chưa có tài khoản? <Link href="/dang-ky" className="link">Đăng ký</Link></p>
     </div>
   );
 }

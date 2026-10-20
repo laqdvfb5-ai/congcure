@@ -12,13 +12,13 @@ export default async function AdminSuppliers({ searchParams }: { searchParams: P
       {suppliers.map((s) => (
         <form key={s.id} action={saveSupplierAction} className="grid items-end gap-2 border-b pb-3 md:grid-cols-5">
           <input type="hidden" name="id" value={s.id} />
-          <label className="text-sm">Tên <span className="text-xs text-gray-500">({s.adapter})</span><input name="name" defaultValue={s.name} className="input" /></label>
+          <label className="text-sm">Tên <span className="text-xs text-muted">({s.adapter})</span><input name="name" defaultValue={s.name} className="input" /></label>
           <label className="text-sm md:col-span-2">Base URL<input name="baseUrl" defaultValue={s.baseUrl} className="input" /></label>
           <label className="text-sm">API key mới<input name="apiKey" placeholder="để trống = giữ nguyên" className="input" /></label>
           <div className="flex items-center gap-2 text-sm">
             <label className="flex items-center gap-1"><input type="checkbox" name="active" defaultChecked={s.active} /> Bật</label>
             <button className="btn-secondary">Lưu</button>
-            <Link href={`/admin/nha-cung-cap/${s.id}/san-pham`} className="text-blue-700">Xem sản phẩm nguồn</Link>
+            <Link href={`/admin/nha-cung-cap/${s.id}/san-pham`} className="link">Xem sản phẩm nguồn</Link>
           </div>
         </form>
       ))}
@@ -34,7 +34,7 @@ export default async function AdminSuppliers({ searchParams }: { searchParams: P
         <label className="text-sm">API key<input name="apiKey" required className="input" /></label>
         <button className="btn">Thêm</button>
       </form>
-      <p className="text-xs text-gray-500">
+      <p className="text-xs text-muted">
         shoptaikhoan: Seller API của shoptaikhoan.store (lấy key ở website, mục Quản lý API key); SKU sản phẩm = ID sản phẩm bên nguồn.
         generic-rest: POST /api/orders, GET /api/products, header X-API-Key.
       </p>

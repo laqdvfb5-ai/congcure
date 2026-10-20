@@ -13,7 +13,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   return (
     <div className="grid gap-6 md:grid-cols-[180px_1fr]">
       <nav className="flex flex-col gap-1 text-sm">
-        {LINKS.map(([href, label]) => <Link key={href} href={href} className="rounded px-2 py-1 hover:bg-gray-100">{label}</Link>)}
+        {LINKS.map(([href, label]) => <Link key={href} href={href} className="rounded px-2 py-1 hover:bg-soft">{label}</Link>)}
       </nav>
       <div>{children}</div>
     </div>

@@ -13,3 +13,4 @@ export * from './orders';
 export * from './suppliers/index';
 export * from './fulfill';
 export * from './queue';
+export * from './stats';

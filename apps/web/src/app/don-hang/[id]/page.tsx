@@ -13,16 +13,16 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
   return (
     <div className="card space-y-3">
       <h1 className="text-xl font-semibold">Đơn #{order.id}: {order.productName}</h1>
-      <div className="text-sm text-gray-600">
+      <div className="text-sm text-muted">
         {order.quantity} × {formatVnd(order.unitPrice)} = <b>{formatVnd(order.total)}</b> · {STATUS_LABEL[order.status]} · {formatDate(order.createdAt)}
       </div>
       {order.status === 'PENDING' && (
-        <p className="rounded bg-yellow-50 px-3 py-2 text-sm text-yellow-800">
+        <p className="rounded bg-yellow-400/15 px-3 py-2 text-sm text-yellow-700 dark:text-yellow-300">
           Đơn đang được xử lý từ nhà cung cấp. Tải lại trang sau ít giây.
         </p>
       )}
       {order.status === 'REFUNDED' && (
-        <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">Đơn thất bại và đã hoàn tiền: {order.error}</p>
+        <p className="rounded bg-accent/10 px-3 py-2 text-sm text-accent">Đơn thất bại và đã hoàn tiền: {order.error}</p>
       )}
       {secrets.length > 0 && (
         <div>

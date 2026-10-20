@@ -17,12 +17,12 @@ export default async function TopupPage() {
         <p className="text-sm">Số dư hiện tại: <b>{formatVnd(user.balance)}</b></p>
         <img src={qr} alt="VietQR" className="mx-auto w-64" />
         <dl className="grid grid-cols-3 gap-1 text-sm">
-          <dt className="text-gray-500">Ngân hàng</dt><dd className="col-span-2">{bankId}</dd>
-          <dt className="text-gray-500">Số tài khoản</dt><dd className="col-span-2 font-mono">{account}</dd>
-          <dt className="text-gray-500">Chủ tài khoản</dt><dd className="col-span-2">{accountName}</dd>
-          <dt className="text-gray-500">Nội dung</dt><dd className="col-span-2 font-mono text-lg font-semibold text-red-600">{user.topupCode}</dd>
+          <dt className="text-muted">Ngân hàng</dt><dd className="col-span-2">{bankId}</dd>
+          <dt className="text-muted">Số tài khoản</dt><dd className="col-span-2 font-mono">{account}</dd>
+          <dt className="text-muted">Chủ tài khoản</dt><dd className="col-span-2">{accountName}</dd>
+          <dt className="text-muted">Nội dung</dt><dd className="col-span-2 font-mono text-lg font-semibold text-accent">{user.topupCode}</dd>
         </dl>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted">
           Ghi đúng nội dung chuyển khoản. Tiền được cộng tự động sau khoảng 1 phút.
           Nếu ghi sai nội dung, hãy liên hệ admin để được cộng tay.
         </p>
@@ -32,11 +32,11 @@ export default async function TopupPage() {
         <table className="table">
           <tbody>
             {history.map((e) => (
-              <tr key={e.id}><td>{formatDate(e.createdAt)}</td><td className="text-green-700">+{formatVnd(e.amount)}</td></tr>
+              <tr key={e.id}><td>{formatDate(e.createdAt)}</td><td className="text-emerald-600 dark:text-emerald-400">+{formatVnd(e.amount)}</td></tr>
             ))}
           </tbody>
         </table>
-        {history.length === 0 && <p className="text-sm text-gray-500">Chưa có giao dịch nạp.</p>}
+        {history.length === 0 && <p className="text-sm text-muted">Chưa có giao dịch nạp.</p>}
       </div>
     </div>
   );
