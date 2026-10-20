@@ -24,7 +24,7 @@ npm workspaces, TypeScript:
 apps/web        Next.js (App Router): giao diện khách + admin + /api/v1 (đại lý) + /api/webhooks/bank
 apps/worker     Tiến trình Node: chạy job pg-boss (xử lý đơn API nguồn, hoàn tiền)
 packages/core   Toàn bộ nghiệp vụ: auth, ví/sổ cái, đơn hàng, kho, giá theo cấp, nạp tiền, adapter nguồn, mã hóa
-packages/db     Prisma schema, migration, seed, Prisma client dùng chung
+packages/db     Migration SQL thuần + pool `pg` dùng chung + helper transaction + seed + script chạy embedded-postgres
 apps/mock-supplier  Server HTTP nhỏ giả làm web nguồn (các chế độ: ok / chậm / lỗi)
 ```
 
@@ -34,9 +34,13 @@ apps/mock-supplier  Server HTTP nhỏ giả làm web nguồn (các chế độ: 
 - Môi trường dev: gói npm `embedded-postgres` (máy dev không có Postgres/Docker), khởi động bằng script `npm run db:start`.
 - Production: Postgres thật, cấu hình qua `DATABASE_URL`.
 
-**Tiền:** số nguyên VND, dùng kiểu `BigInt` trong Prisma.
+**Không dùng ORM.** Ghi chú ngày 2026-10-16: tag `latest` của Prisma trên npm đang là bản RC (8.0.0-rc), và phần nghiệp vụ chủ yếu là SQL viết tay (`FOR UPDATE SKIP LOCKED`, update có điều kiện). Vì vậy dùng `pg` + file migration `.sql` đánh số thứ tự, chạy bằng script migrate tự viết (lưu vết trong bảng `_migrations`). Tên bảng và cột dùng snake_case.
+
+**Tiền:** số nguyên VND, cột `BIGINT`. Trong code TypeScript dùng kiểu `number`, vì mọi giá trị đều nhỏ hơn 2^53.
 
 ## 3. Mô hình dữ liệu
+
+(Tên trường viết camelCase dưới đây chỉ để dễ đọc; trong SQL là snake_case, ví dụ `password_hash`, `order_id`. Bảng `Order` có tên SQL là `orders`, `User` là `users`.)
 
 - **User**: id, email (duy nhất), passwordHash (scrypt), name, role `CUSTOMER|STAFF|ADMIN`, tier `MEMBER|CTV|AGENT`, balance BigInt ≥ 0, topupCode (duy nhất, ví dụ `NAP12345`), createdAt.
 - **Session**: id (token ngẫu nhiên, lưu bản băm), userId, expiresAt. Gửi cho trình duyệt qua cookie httpOnly.
