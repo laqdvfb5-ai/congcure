@@ -30,9 +30,6 @@ export async function registerAction(form: FormData) {
 
 export async function loginAction(form: FormData) {
   try {
-    if (!rateLimit(`login:${await clientIp()}`, 10, 10 * 60_000)) {
-      throw new core.AppError('RATE_LIMITED', 'Đăng nhập sai quá nhiều lần, thử lại sau 10 phút');
-    }
     const { token } = await core.login(String(form.get('email') ?? ''), String(form.get('password') ?? ''));
     await setSessionCookie(token);
   } catch (e) {

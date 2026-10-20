@@ -111,7 +111,7 @@ Interface của adapter nguồn: `placeOrder`, `getOrder`, `listProducts`. Adapt
 - Tài khoản bán ra và khóa API của nhà cung cấp được mã hóa AES-256-GCM.
 - Webhook xác thực bằng token, so sánh theo thời gian không đổi.
 - Server Action dùng cơ chế chống CSRF sẵn có của Next.js.
-- Giới hạn tần suất (rate limit) cho đăng nhập và `/api/v1`, đếm trong bộ nhớ theo IP/khóa API (đủ dùng khi chỉ chạy một tiến trình).
+- Giới hạn tần suất (rate limit) cho đăng ký và `/api/v1` (đăng nhập không giới hạn, theo yêu cầu ngày 2026-10-21), đếm trong bộ nhớ theo IP/khóa API (đủ dùng khi chỉ chạy một tiến trình).
 
 ## 7. Test
 
