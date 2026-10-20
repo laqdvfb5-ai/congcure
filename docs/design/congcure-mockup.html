@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>congcure — mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@500&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FEFEFD;--fg:#000;--mute:#D1D1D1;--ink2:#6F6F6C;--line:#E4E4E0;--soft:#F3F3EF;--ok:#00A651;--warn:#F2A900;--bad:#FF2D2D;--m:16px}
+.dark{--bg:#0B0B0B;--fg:#FEFEFD;--mute:#3A3A3A;--ink2:#8E8E8A;--line:#242424;--soft:#141414}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:500 14px/1.3 Geist,system-ui,sans-serif;letter-spacing:-.02em;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.money{text-transform:none}
+sup{font-size:.42em;vertical-align:top;position:relative;top:.18em;margin-left:.06em;letter-spacing:0}
+.t12{font-size:12px;line-height:1.15;text-transform:uppercase;letter-spacing:-.02em}
+.t24{font-size:24px;line-height:1.1;letter-spacing:-.045em}
+.t36{font-size:36px;line-height:1.05;letter-spacing:-.05em}
+.t72{font-size:72px;line-height:1;letter-spacing:-.05em;text-transform:uppercase}
+.mono{font-family:'Geist Mono',ui-monospace,monospace;letter-spacing:-.02em}
+.tnum{font-variant-numeric:tabular-nums}
+.ink2{color:var(--ink2)}.mute{color:var(--mute)}
+.x{padding-left:var(--m);padding-right:var(--m)}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:6px;vertical-align:1px}
+.dot--off{background:var(--mute)}.dot--warn{background:var(--warn)}.dot--bad{background:var(--bad)}
+.pulse{animation:pulse 1.6s ease-in-out infinite}@keyframes pulse{50%{opacity:.25}}
+
+/* util + header */
+.util{display:flex;justify-content:space-between;align-items:center;height:32px;border-bottom:1px solid var(--line)}
+.util nav{display:flex;gap:22px}
+.head{display:grid;grid-template-columns:auto minmax(0,560px) 1fr;align-items:center;gap:32px;height:76px}
+.logo{font-size:30px;letter-spacing:-.06em;text-transform:uppercase;line-height:1}
+.search{display:flex;align-items:center;gap:10px;height:42px;border:1px solid var(--fg);padding:0 14px}
+.search input{all:unset;flex:1;font-size:14px}.search input::placeholder{color:var(--ink2)}
+.acts{display:flex;justify-content:flex-end;gap:24px;align-items:center}
+.acts a:hover,.util a:hover,.nav a:hover{text-decoration:underline;text-underline-offset:3px}
+.nav{display:flex;gap:28px;align-items:center;height:40px;border-top:1px solid var(--line);border-bottom:1px solid var(--fg)}
+.nav .on{text-decoration:underline;text-underline-offset:3px}
+.nav .sp{flex:1}
+
+/* hero */
+.hero{position:relative;height:640px;display:grid;grid-template-columns:minmax(0,9fr) minmax(0,15fr);border-bottom:1px solid var(--fg);overflow:hidden}
+.hero__left{position:relative;padding:22px var(--m);border-right:1px solid var(--line)}
+.hero__intro{max-width:380px;font-size:14px;line-height:1.25}
+.hero__intro p{margin:0 0 10px}
+.hero__more{display:inline-flex;gap:6px;margin-top:6px}
+.mega{position:absolute;left:var(--m);bottom:14px;z-index:6;font-size:clamp(56px,8.1vw,128px);line-height:1.08;letter-spacing:-.055em;text-transform:uppercase;margin:0;color:#fff;mix-blend-mode:difference;white-space:nowrap;pointer-events:none;font-weight:500}
+.mega sup{font-size:.5em;top:.12em}
+.hero__right{position:relative}
+.pattern{position:absolute;inset:-6px 0 0 34px;display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:0 46px;color:var(--mute);font-size:36px;line-height:.98;letter-spacing:-.05em;user-select:none;pointer-events:none;overflow:hidden}
+.pattern div{display:flex;flex-direction:column;gap:8px}.pattern div:nth-child(2){margin-top:48px}
+.collage{position:absolute;inset:0}
+.collage .tile{position:absolute;transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s}
+.collage .tile:hover{transform:translateY(-6px);z-index:5;box-shadow:0 18px 40px -18px rgba(0,0,0,.45)}
+.badge{position:absolute;width:132px;height:132px;left:20%;top:236px;z-index:4;color:var(--fg);background:var(--bg);border-radius:50%}
+.badge svg{width:100%;height:100%;animation:spin 26s linear infinite}
+.badge text{font:500 10.5px Geist;letter-spacing:.06em;text-transform:uppercase;fill:currentColor}
+@keyframes spin{to{transform:rotate(360deg)}}
+.star{position:absolute;right:16px;top:22px;width:70px;stroke:var(--fg);stroke-width:1.4;fill:none}
+.facts{position:absolute;right:var(--m);bottom:22px;font-size:12px;line-height:1.15;text-align:right;z-index:4}
+.facts b{font-weight:500;font-size:24px;letter-spacing:-.045em;display:block}
+
+/* tiles */
+.tile{display:grid;place-items:center;aspect-ratio:1;background:var(--c);color:var(--on);overflow:hidden;position:relative;flex:none}
+.tile svg{width:40%;height:40%;fill:currentColor}
+.tile__mono{font-size:min(30cqi,44px);letter-spacing:-.06em;line-height:1}
+.tile{container-type:inline-size}
+.tile__mono{font-size:22cqi}
+.tile__tag,.tile__price{position:absolute;left:9px;font-size:10px;line-height:1;letter-spacing:0;font-family:'Geist Mono',monospace;opacity:.92}.tile__tag{text-transform:uppercase}
+.tile__tag{top:9px}.tile__price{bottom:9px}
+
+/* tools */
+.tools{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--fg)}
+.tool{display:flex;flex-direction:column;gap:10px;padding:18px var(--m) 20px;border-right:1px solid var(--line);min-height:168px;transition:background .2s,color .2s}
+.tool:last-child{border-right:0}
+.tool:hover{background:var(--fg);color:var(--bg)}
+.tool:hover .ink2{color:inherit;opacity:.65}
+.tool__top{display:flex;justify-content:space-between}
+.tool p{margin:auto 0 0;max-width:340px;font-size:14px;line-height:1.25}
+
+/* category bar */
+.cats{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);display:flex;gap:26px;align-items:baseline;height:64px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none;white-space:nowrap}
+.cats sup{font-size:.5em}.cats a{font-size:24px;letter-spacing:-.045em;color:var(--mute);padding-top:18px;transition:color .15s}
+.cats a:hover,.cats a.on{color:var(--fg)}
+.cats .end{margin-left:auto;font-size:12px;color:var(--fg);text-transform:uppercase;letter-spacing:-.02em}
+
+/* sections + rows */
+.sec{padding-top:44px}
+.sec__head{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:14px;border-bottom:1px solid var(--fg)}
+.row{display:grid;grid-template-columns:64px minmax(0,1fr) 110px 120px 140px 190px;gap:24px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.row__tile{width:64px}
+.row__name{font-size:20px;letter-spacing:-.045em;line-height:1.1}
+.row__name:hover{text-decoration:underline;text-underline-offset:3px}
+.row__fmt{margin-top:6px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row__type{color:var(--ink2)}
+.row__price{font-size:24px;letter-spacing:-.045em;text-align:right}
+.row__cta{display:flex;justify-content:flex-end}
+.row.is-out{color:var(--mute)}.row.is-out .tile{filter:grayscale(1);opacity:.35}.row.is-out .row__fmt{color:var(--mute)}
+.stock.is-out{color:var(--mute)}
+.sec__more{display:flex;justify-content:center;padding:22px 0 6px}
+
+/* buy button (General Admission "ADD TO CART" shape) */
+.buy{display:inline-flex;align-items:stretch;height:44px;color:var(--fg);cursor:pointer}
+.buy__label{display:flex;align-items:center;padding:0 16px;border:1px solid var(--fg);font-size:14px;text-transform:uppercase;letter-spacing:-.02em;transition:background .15s,color .15s}
+.buy__arrow{width:50px;height:44px;margin-left:-1px;overflow:visible}
+.buy__arrow polygon{fill:var(--bg);stroke:var(--fg);stroke-width:1;transition:fill .15s}
+.buy__arrow path{stroke:var(--fg);stroke-width:1.6;fill:none;transition:stroke .15s}
+.buy:hover .buy__label{background:var(--fg);color:var(--bg)}
+.buy:hover polygon{fill:var(--fg)}.buy:hover .buy__arrow path{stroke:var(--bg)}
+.buy--lg{height:58px}.buy--lg .buy__label{font-size:24px;letter-spacing:-.045em;padding:0 20px}.buy--lg .buy__arrow{height:58px;width:66px}
+.buy--ghost .buy__label{border-style:solid}
+
+/* product detail */
+.pd{display:grid;grid-template-columns:48px minmax(0,11fr) minmax(0,12fr);gap:24px;padding-top:28px;padding-bottom:56px;border-bottom:1px solid var(--fg)}
+.pd__thumbs{display:flex;flex-direction:column;gap:8px}
+.pd__thumbs .tile{width:48px}
+.pd__thumbs .tile:first-child{outline:1px solid var(--fg);outline-offset:3px}
+.pd__media .tile{width:100%;max-width:620px}
+.pd__info{padding-left:24px}
+.pd__info h1{font-size:44px;line-height:1.05;letter-spacing:-.05em;margin:0;font-weight:500}
+.pd__by{font-size:36px;line-height:1.05;letter-spacing:-.05em;color:var(--mute);margin-top:4px}
+.pd__price{font-size:36px;letter-spacing:-.05em;margin:22px 0 18px}
+.spec{display:grid;grid-template-columns:120px 1fr;gap:9px 12px;font-size:14px;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.spec dt{color:var(--ink2);text-transform:uppercase;font-size:12px;padding-top:2px}
+.spec dd{margin:0}
+.qty{display:flex;align-items:center;gap:18px;margin:22px 0}
+.step{display:inline-flex;border:1px solid var(--fg);height:44px}
+.step button{all:unset;width:44px;display:grid;place-items:center;font-size:20px;cursor:pointer}
+.step span{width:56px;display:grid;place-items:center;border-left:1px solid var(--fg);border-right:1px solid var(--fg);font-size:16px}
+.tiers{margin-top:26px;font-size:14px}
+.tiers div{display:grid;grid-template-columns:1fr auto;padding:8px 0;border-bottom:1px solid var(--line)}
+.tiers .me{color:var(--fg)}.tiers div:not(.me){color:var(--ink2)}
+
+/* quick-buy panel (slides from right like General Admission's cart) */
+.panelwrap{position:relative;height:640px;border-bottom:1px solid var(--fg);background:repeating-linear-gradient(90deg,transparent 0 59px,var(--line) 59px 60px);overflow:hidden}
+.panelwrap::before{content:'';position:absolute;inset:0;background:var(--bg);opacity:.72}
+.panel{position:absolute;right:0;top:0;bottom:0;width:560px;background:var(--bg);border-left:1px solid var(--fg);display:grid;grid-template-columns:44px 1fr}
+.panel__close{border-right:1px solid var(--line);display:flex;justify-content:center;align-items:flex-start;padding-top:18px}
+.panel__close span{writing-mode:vertical-rl;transform:rotate(180deg)}
+.panel__body{padding:18px 24px;display:flex;flex-direction:column;gap:18px}
+.panel__item{display:grid;grid-template-columns:96px 1fr;gap:16px;align-items:end;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.panel__item .tile{width:96px}
+.sum{display:grid;grid-template-columns:1fr auto;gap:10px;font-size:16px}
+.sum .big{font-size:36px;letter-spacing:-.05em}
+.panel__foot{margin-top:auto;display:flex;flex-direction:column;gap:10px}
+.panel__foot .buy{width:100%}.panel__foot .buy__label{flex:1;justify-content:space-between}
+
+/* receipt */
+.rc{display:grid;grid-template-columns:minmax(0,9fr) minmax(0,15fr);border-bottom:1px solid var(--fg)}
+.rc__left{padding:24px var(--m) 32px 0;border-right:1px solid var(--line)}
+.rc__meta{display:grid;grid-template-columns:1fr 1fr;gap:18px 12px;margin-top:28px}
+.rc__meta .t12{color:var(--ink2);margin-bottom:5px}
+.rc__meta div div:last-child{font-size:20px;letter-spacing:-.045em}
+.rc__right{padding:24px 0 32px var(--m)}
+.rc__bar{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--fg)}
+.rc__bar .acts{gap:10px}
+.chip{display:inline-flex;align-items:center;height:32px;padding:0 12px;border:1px solid var(--fg);font-size:12px;text-transform:uppercase}
+.chip:hover{background:var(--fg);color:var(--bg)}
+.acc{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:16px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line);font-size:14px}
+.acc__copy{font-size:12px;text-transform:uppercase}.acc__copy:hover{text-decoration:underline}
+
+/* top-up */
+.tu{display:grid;grid-template-columns:minmax(0,9fr) minmax(0,15fr);border-bottom:1px solid var(--fg)}
+.tu__left{padding:24px var(--m) 32px 0;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:26px}
+.steps{display:grid;gap:12px;font-size:16px;line-height:1.25}.steps div{display:grid;grid-template-columns:36px 1fr}
+.amounts{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:32px;letter-spacing:-.05em}
+.amounts a{color:var(--mute)}.amounts a.on,.amounts a:hover{color:var(--fg)}
+.wait{display:flex;align-items:center;gap:8px;padding:12px 14px;border:1px solid var(--fg);font-size:12px;text-transform:uppercase;width:max-content}
+.tu__right{padding:24px 0 32px var(--m);display:grid;grid-template-columns:300px 1fr;gap:28px;align-items:start}
+.qr{border:1px solid var(--fg);padding:12px;background:#fff}.qr img{width:100%;display:block}
+.kv{display:grid;grid-template-columns:130px 1fr auto;gap:0;font-size:16px;margin:0}
+.kv>*{padding:13px 0;border-bottom:1px solid var(--line)}
+.kv dt{color:var(--ink2);font-size:12px;text-transform:uppercase;padding-top:16px}
+.kv dd{margin:0}.kv .cp{font-size:12px;text-transform:uppercase;text-align:right;padding-top:16px}
+.kv .memo{font-family:'Geist Mono',monospace;font-size:36px;letter-spacing:-.04em;line-height:1}
+
+/* footer */
+.foot{border-top:1px solid var(--fg);margin-top:72px}
+.foot__cols{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;padding:20px var(--m) 0}
+.foot__cols p{margin:0;max-width:300px;font-size:14px;line-height:1.25}
+.foot__cols a{display:block;font-size:14px;line-height:1.5}
+.giant{font-size:17.6vw;line-height:.86;letter-spacing:-.065em;text-transform:uppercase;white-space:nowrap;margin:26px 0 0 -.02em;padding:0 var(--m)}
+.giant sup{font-size:.3em;top:.25em}
+.foot__bar{display:flex;justify-content:space-between;padding:10px var(--m);border-top:1px solid var(--line)}
+
+.label{display:flex;justify-content:space-between;padding:28px var(--m) 10px;color:var(--ink2)}
+
+@media (max-width:820px){
+  :root{--m:14px}
+  .util>span:first-child,.util nav span{display:none}.util nav a:not(.keep){display:none}
+  .head{grid-template-columns:1fr auto;height:auto;padding-top:14px;gap:12px}
+  .search{grid-column:1/-1;order:3;margin-bottom:12px}
+  .acts a:not(.keep){display:none}
+  .nav{overflow-x:auto;white-space:nowrap;gap:20px}
+  .hero{display:flex;flex-direction:column;height:auto}.hero__right{order:1}.mega{order:2}.hero__left{order:3}
+  .hero__right{order:-1;padding:14px 0 0}
+  .collage{position:static;display:flex;gap:8px;overflow-x:auto;padding:0 var(--m) 14px;scrollbar-width:none}
+  .collage .tile{position:relative;left:auto!important;top:auto!important;width:118px!important}
+  .badge,.star,.pattern{display:none}
+  .hero__left{border-right:0;padding-bottom:4px}
+  .mega{position:static;padding:0 var(--m) 18px;font-size:12.6vw;white-space:normal;color:var(--fg);mix-blend-mode:normal}
+  .facts{display:none}
+  .tools{grid-template-columns:1fr}.tool{border-right:0;border-bottom:1px solid var(--line);min-height:0}
+  .cats a{font-size:20px}
+  .t72{font-size:44px}
+  .row{grid-template-columns:52px minmax(0,1fr) auto;gap:6px 14px;padding:14px 0}
+  .row__tile{width:52px;grid-row:span 2}
+  .row__type{display:none}
+  .row__stock{grid-column:2;grid-row:2;font-size:12px}
+  .row__price{grid-column:3;grid-row:1;font-size:18px}
+  .row__cta{grid-column:3;grid-row:2}
+  .row__cta .buy{height:36px}.row__cta .buy__label{display:none}.row__cta .buy__arrow{height:36px;width:42px}
+  .row__name{font-size:17px}.row__fmt{white-space:normal;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical}
+  .pd{grid-template-columns:1fr}.pd__thumbs{display:none}.pd__info{padding-left:0}
+  .panel{width:100%;grid-template-columns:36px 1fr}
+  .rc,.tu{grid-template-columns:1fr}.rc__left,.tu__left{border-right:0;padding-right:0}.rc__right{padding-left:0}
+  .tu__right{grid-template-columns:1fr;padding-left:0}.qr{max-width:280px}.amounts{font-size:28px}
+  .foot__cols{grid-template-columns:1fr 1fr}
+}
+@media (prefers-reduced-motion:reduce){.badge svg,.pulse{animation:none}}
+</style></head>
+<body>
+<div class="util x t12">
+  <span>Congcure® — kho tài khoản số</span>
+  <span class="ink2"><i class="dot"></i>Hệ thống hoạt động bình thường</span>
+  <nav><span class="keep">Hỗ trợ 09:00—22:00</span><a href="#">Chính sách</a><a href="#">FAQ</a><a class="keep" href="#">Telegram ↗</a></nav>
+</div>
+<header class="x">
+  <div class="head">
+    <a class="logo" href="#">Congcure<sup>®</sup></a>
+    <label class="search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input placeholder="Tìm Gmail, Netflix, TikTok…"><span class="t12 ink2">↵</span></label>
+    <div class="acts t12"><a class="keep" href="#">Ví (<span class="money">150.000đ</span>)</a><a href="#">Đơn hàng (06)</a><a href="#">Khách lẻ ↓</a><a class="keep" href="#" onclick="document.documentElement.classList.toggle('dark');return false">Tối / Sáng</a></div>
+  </div>
+  <nav class="nav t12"><a class="on" href="#">Trang chủ</a><a href="#">Sản phẩm</a><a href="#">Nạp tiền</a><a href="#">Lịch sử</a><a href="#">API đại lý</a><a href="#">Công cụ 2FA</a><span class="sp"></span><a href="#" class="ink2">Kênh thông báo ↗</a></nav>
+</header>
+
+<section class="hero x" style="padding:0">
+  <div class="hero__left">
+    <div class="hero__intro">
+      <p>Congcure là kho tài khoản số cho dân MMO: email, mạng xã hội, giải trí, AI. Nạp ví một lần bằng VietQR — mua là nhận tài khoản ngay, không chờ admin.</p>
+      <p class="ink2">Đơn lấy từ nguồn mà lỗi sẽ tự hoàn tiền vào ví.</p>
+      <a class="hero__more t12" href="#">← Cách mua hàng</a>
+    </div>
+  </div>
+  <div class="hero__right">
+    <div class="pattern" aria-hidden="true"><div><span>Congcure®</span><span>Tài khoản<br>số</span><span>Congcure®</span><span>Tài khoản<br>số</span><span>Congcure®</span><span>Tài khoản<br>số</span><span>Congcure®</span></div><div><span>Tài khoản<br>số</span><span>Congcure®</span><span>Tài khoản<br>số</span><span>Congcure®</span><span>Tài khoản<br>số</span><span>Congcure®</span><span>Tài khoản<br>số</span></div><div><span>Congcure®</span><span>Tài khoản<br>số</span><span>Congcure®</span><span>Tài khoản<br>số</span><span>Congcure®</span><span>Tài khoản<br>số</span><span>Congcure®</span></div></div>
+    <div class="collage"><span class="tile " style="--c:#E50914;--on:#fff;width:210px;left:31%;top:34px;">
+    <span class="tile__tag">Netflix</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5.398 0 8.348 23.602c2.346.059 4.856.398 4.856.398L10.113 0H5.398zm8.489 0v9.172l4.715 13.33V0h-4.715zM5.398 1.5V24c1.873-.225 2.81-.312 4.715-.398V14.83L5.398 1.5z"/></svg><span class="tile__price">60.000đ</span></span><span class="tile " style="--c:#0866FF;--on:#fff;width:250px;left:63%;top:70px;">
+    <span class="tile__tag">Facebook</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/></svg><span class="tile__price">320.000đ</span></span><span class="tile " style="--c:#EA4335;--on:#fff;width:150px;left:49%;top:250px;">
+    <span class="tile__tag">Gmail</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg><span class="tile__price">15.000đ</span></span><span class="tile " style="--c:#1ED760;--on:#fff;width:118px;left:80%;top:16px;">
+    <span class="tile__tag">Spotify</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg><span class="tile__price">25.000đ</span></span><span class="tile " style="--c:#10A37F;--on:#fff;width:176px;left:86%;top:250px;">
+    <span class="tile__tag">ChatGPT</span><span class="tile__mono">GPT</span><span class="tile__price">120.000đ</span></span><span class="tile " style="--c:#000000;--on:#fff;width:132px;left:74%;top:392px;">
+    <span class="tile__tag">TikTok</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg><span class="tile__price">85.000đ</span></span><span class="tile " style="--c:#0078D4;--on:#fff;width:168px;left:3%;top:392px;">
+    <span class="tile__tag">Hotmail</span><span class="tile__mono">Hotmail</span><span class="tile__price">195đ</span></span><span class="tile " style="--c:#26A5E4;--on:#fff;width:112px;left:40%;top:470px;">
+    <span class="tile__tag">Telegram</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg><span class="tile__price">28.000đ</span></span><span class="tile " style="--c:#5865F2;--on:#fff;width:92px;left:58%;top:560px;">
+    <span class="tile__tag">Discord</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg><span class="tile__price">35.000đ</span></span></div>
+    <div class="badge" aria-hidden="true"><svg viewBox="0 0 132 132"><defs><path id="c" d="M66,66 m-52,0 a52,52 0 1,1 104,0 a52,52 0 1,1 -104,0"/></defs><text><textPath href="#c">Giao ngay · Nạp VietQR · Tự động 24/7 · Hoàn tiền tự động ·</textPath></text></svg></div>
+    <svg class="star" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6c1 30-2 58 1 88M10 30c26 12 54 26 82 38M88 26C66 44 38 60 12 74"/></svg>
+    <div class="facts"><b class="tnum">14 sản phẩm</b>2.418 đơn đã giao<br>Thời gian giao trung bình 3 giây</div>
+  </div>
+  <h1 class="mega">Congcure<sup>®</sup><br>Tài khoản số<br>Giao 24/7</h1>
+</section>
+
+<section class="tools">
+  <a class="tool" href="#"><div class="tool__top t12"><span class="ink2">01 — Công cụ</span><span>→</span></div><div class="t36">Lấy mã 2FA</div><p class="ink2">Dán secret key, nhận mã OTP 6 số ngay trên web — thay Google Authenticator.</p></a>
+  <a class="tool" href="#"><div class="tool__top t12"><span class="ink2">02 — Nạp ví</span><span>→</span></div><div class="t36">VietQR tự động</div><p class="ink2">Quét mã, ghi đúng nội dung. Tiền vào ví trong khoảng 1 phút, kể cả nửa đêm.</p></a>
+  <a class="tool" href="#"><div class="tool__top t12"><span class="ink2">03 — Đại lý</span><span>→</span></div><div class="t36">API bán lại</div><p class="ink2">Khóa API riêng, giá theo cấp CTV / Đại lý, chống mua trùng bằng Idempotency-Key.</p></a>
+</section>
+
+<nav class="cats x" id="san-pham"><a class="on" href="#">Tất cả<sup>(14)</sup></a><a href="#email">Email<sup>(04)</sup></a><a href="#mang-xa-hoi">Mạng xã hội<sup>(04)</sup></a><a href="#giai-tri">Giải trí<sup>(03)</sup></a><a href="#ai-cong-cu">AI & Công cụ<sup>(03)</sup></a><span class="end">Giá cho: Thành viên</span></nav>
+
+<main class="x">
+<section class="sec" id="email">
+  <div class="sec__head"><h2 class="t72" style="margin:0">Email<sup>(04)</sup></h2><a class="t12" href="#">Xem tất cả →</a></div>
+  <div class="row">
+    <span class="tile row__tile" style="--c:#EA4335;--on:#fff;">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg></span>
+    <div class="row__main"><a class="row__name" href="#san-pham">Gmail cổ 2015</a><div class="row__fmt">» email|mật khẩu|email khôi phục — đã xác minh SĐT</div></div>
+    <div class="row__type t12">KHO</div>
+    <div class="row__stock"><span class="stock"><i class="dot dot--ok"></i>17 còn</span></div>
+    <div class="row__price tnum">15.000đ</div>
+    <div class="row__cta"><a class="buy " href="#san-pham"><span class="buy__label">Mua ngay</span><svg class="buy__arrow" viewBox="0 0 50 44" aria-hidden="true"><polygon points="7,.5 43,.5 49.5,22 43,43.5 7,43.5 .5,22"/><path d="M15 22h19M27 14.5l7.5 7.5-7.5 7.5"/></svg></a></div>
+  </div><div class="row">
+    <span class="tile row__tile" style="--c:#0078D4;--on:#fff;">
+    <span class="tile__mono">Hotmail</span></span>
+    <div class="row__main"><a class="row__name" href="#san-pham">Hotmail Trusted OAuth2</a><div class="row__fmt">» mail|pass|refresh_token|client_id — sống vĩnh viễn</div></div>
+    <div class="row__type t12">KHO</div>
+    <div class="row__stock"><span class="stock"><i class="dot dot--ok"></i>90.352 còn</span></div>
+    <div class="row__price tnum">195đ</div>
+    <div class="row__cta"><a class="buy " href="#san-pham"><span class="buy__label">Mua ngay</span><svg class="buy__arrow" viewBox="0 0 50 44" aria-hidden="true"><polygon points="7,.5 43,.5 49.5,22 43,43.5 7,43.5 .5,22"/><path d="M15 22h19M27 14.5l7.5 7.5-7.5 7.5"/></svg></a></div>
+  </div><div class="row">
+    <span class="tile row__tile" style="--c:#0078D4;--on:#fff;">
+    <span class="tile__mono">Outlook</span></span>
+    <div class="row__main"><a class="row__name" href="#san-pham">Outlook NEW — kèm refresh token</a><div class="row__fmt">» mail|pass|refresh_token — dùng trong 12 giờ</div></div>
+    <div class="row__type t12">KHO</div>
+    <div class="row__stock"><span class="stock"><i class="dot dot--ok"></i>9 còn</span></div>
+    <div class="row__price tnum">150đ</div>
+    <div class="row__cta"><a class="buy " href="#san-pham"><span class="buy__label">Mua ngay</span><svg class="buy__arrow" viewBox="0 0 50 44" aria-hidden="true"><polygon points="7,.5 43,.5 49.5,22 43,43.5 7,43.5 .5,22"/><path d="M15 22h19M27 14.5l7.5 7.5-7.5 7.5"/></svg></a></div>
+  </div><div class="row is-out">
+    <span class="tile row__tile" style="--c:#EA4335;--on:#fff;">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg></span>
+    <div class="row__main"><a class="row__name" href="#san-pham">Gmail EDU .edu.pl — 1 năm</a><div class="row__fmt">» mail|pass — hạn 12 tháng, đọc thư qua web</div></div>
+    <div class="row__type t12">KHO</div>
+    <div class="row__stock"><span class="stock is-out"><i class="dot dot--off"></i>Hết hàng</span></div>
+    <div class="row__price tnum">509đ</div>
+    <div class="row__cta"><span class="t12 ink2">Tạm hết — báo khi có</span></div>
+  </div>
+</section><section class="sec" id="mang-xa-hoi">
+  <div class="sec__head"><h2 class="t72" style="margin:0">Mạng xã hội<sup>(04)</sup></h2><a class="t12" href="#">Xem tất cả →</a></div>
+  <div class="row">
+    <span class="tile row__tile" style="--c:#0866FF;--on:#fff;">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/></svg></span>
+    <div class="row__main"><a class="row__name" href="#san-pham">Facebook VIA Việt Nam 2012</a><div class="row__fmt">» uid|pass|2fa|cookie — 500 bạn bè, có avatar</div></div>
+    <div class="row__type t12">HÀNG RIÊNG</div>
+    <div class="row__stock"><span class="stock"><i class="dot dot--ok"></i>1 còn</span></div>
+    <div class="row__price tnum">320.000đ</div>
+    <div class="row__cta"><a class="buy " href="#san-pham"><span class="buy__label">Mua ngay</span><svg class="buy__arrow" viewBox="0 0 50 44" aria-hidden="true"><polygon points="7,.5 43,.5 49.5,22 43,43.5 7,43.5 .5,22"/><path d="M15 22h19M27 14.5l7.5 7.5-7.5 7.5"/></svg></a></div>
+  </div><div class="row">
+    <span class="tile row__tile" style="--c:#000000;--on:#fff;">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></span>
+    <div class="row__main"><a class="row__name" href="#san-pham">TikTok 1K follow — ngâm 30 ngày</a><div class="row__fmt">» user|pass|mail|pass mail — mở được LIVE</div></div>
+    <div class="row__type t12">KHO</div>
+    <div class="row__stock"><span class="stock"><i class="dot dot--ok"></i>12 còn</span></div>
+    <div class="row__price tnum">85.000đ</div>
+    <div class="row__cta"><a class="buy " href="#san-pham"><span class="buy__label">Mua ngay</span><svg class="buy__arrow" viewBox="0 0 50 44" aria-hidden="true"><polygon points="7,.5 43,.5 49.5,22 43,43.5 7,43.5 .5,22"/><path d="M15 22h19M27 14.5l7.5 7.5-7.5 7.5"/></svg></a></div>
+  </div><div class="row">
+    <span class="tile row__tile" style="--c:#FF0069;--on:#fff;">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></svg></span>
+    <div class="row__main"><a class="row__name" href="#san-pham">Instagram cổ 2018 + 2FA</a><div class="row__fmt">» user|pass|2fa — đăng nhập ổn định</div></div>
+    <div class="row__type t12">KHO</div>
+    <div class="row__stock"><span class="stock"><i class="dot dot--ok"></i>44 còn</span></div>
+    <div class="row__price tnum">45.000đ</div>
+    <div class="row__cta"><a class="buy " href="#san-pham"><span class="buy__label">Mua ngay</span><svg class="buy__arrow" viewBox="0 0 50 44" aria-hidden="true"><polygon points="7,.5 43,.5 49.5,22 43,43.5 7,43.5 .5,22"/><path d="M15 22h19M27 14.5l7.5 7.5-7.5 7.5"/></svg></a></div>
+  </div><div class="row">
+    <span class="tile row__tile" style="--c:#26A5E4;--on:#fff;">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></span>
+    <div class="row__main"><a class="row__name" href="#san-pham">Telegram số Mỹ +1 — session</a><div class="row__fmt">» phone|session — giao file .session</div></div>
+    <div class="row__type t12">KHO</div>
+    <div class="row__stock"><span class="stock"><i class="dot dot--ok"></i>130 còn</span></div>
+    <div class="row__price tnum">28.000đ</div>
+    <div class="row__cta"><a class="buy " href="#san-pham"><span class="buy__label">Mua ngay</span><svg class="buy__arrow" viewBox="0 0 50 44" aria-hidden="true"><polygon points="7,.5 43,.5 49.5,22 43,43.5 7,43.5 .5,22"/><path d="M15 22h19M27 14.5l7.5 7.5-7.5 7.5"/></svg></a></div>
+  </div>
+</section><section class="sec" id="giai-tri">
+  <div class="sec__head"><h2 class="t72" style="margin:0">Giải trí<sup>(03)</sup></h2><a class="t12" href="#">Xem tất cả →</a></div>
+  <div class="row">
+    <span class="tile row__tile" style="--c:#E50914;--on:#fff;">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5.398 0 8.348 23.602c2.346.059 4.856.398 4.856.398L10.113 0H5.398zm8.489 0v9.172l4.715 13.33V0h-4.715zM5.398 1.5V24c1.873-.225 2.81-.312 4.715-.398V14.83L5.398 1.5z"/></svg></span>
+    <div class="row__main"><a class="row__name" href="#san-pham">Netflix Premium 1 tháng — 4K</a><div class="row__fmt">» email|pass|profile — lấy trực tiếp từ nguồn</div></div>
+    <div class="row__type t12">NGUỒN API</div>
+    <div class="row__stock"><span class="stock"><i class="dot dot--ok"></i>Luôn có</span></div>
+    <div class="row__price tnum">60.000đ</div>
+    <div class="row__cta"><a class="buy " href="#san-pham"><span class="buy__label">Mua ngay</span><svg class="buy__arrow" viewBox="0 0 50 44" aria-hidden="true"><polygon points="7,.5 43,.5 49.5,22 43,43.5 7,43.5 .5,22"/><path d="M15 22h19M27 14.5l7.5 7.5-7.5 7.5"/></svg></a></div>
+  </div><div class="row">
+    <span class="tile row__tile" style="--c:#1ED760;--on:#fff;">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg></span>
+    <div class="row__main"><a class="row__name" href="#san-pham">Spotify Premium 1 tháng</a><div class="row__fmt">» email|pass — gia hạn chính chủ</div></div>
+    <div class="row__type t12">NGUỒN API</div>
+    <div class="row__stock"><span class="stock"><i class="dot dot--ok"></i>Luôn có</span></div>
+    <div class="row__price tnum">25.000đ</div>
+    <div class="row__cta"><a class="buy " href="#san-pham"><span class="buy__label">Mua ngay</span><svg class="buy__arrow" viewBox="0 0 50 44" aria-hidden="true"><polygon points="7,.5 43,.5 49.5,22 43,43.5 7,43.5 .5,22"/><path d="M15 22h19M27 14.5l7.5 7.5-7.5 7.5"/></svg></a></div>
+  </div><div class="row">
+    <span class="tile row__tile" style="--c:#FF0000;--on:#fff;">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></span>
+    <div class="row__main"><a class="row__name" href="#san-pham">YouTube Premium 1 tháng</a><div class="row__fmt">» email mời vào family — tự động</div></div>
+    <div class="row__type t12">NGUỒN API</div>
+    <div class="row__stock"><span class="stock"><i class="dot dot--ok"></i>Luôn có</span></div>
+    <div class="row__price tnum">30.000đ</div>
+    <div class="row__cta"><a class="buy " href="#san-pham"><span class="buy__label">Mua ngay</span><svg class="buy__arrow" viewBox="0 0 50 44" aria-hidden="true"><polygon points="7,.5 43,.5 49.5,22 43,43.5 7,43.5 .5,22"/><path d="M15 22h19M27 14.5l7.5 7.5-7.5 7.5"/></svg></a></div>
+  </div>
+</section><section class="sec" id="ai-cong-cu">
+  <div class="sec__head"><h2 class="t72" style="margin:0">AI & Công cụ<sup>(03)</sup></h2><a class="t12" href="#">Xem tất cả →</a></div>
+  <div class="row">
+    <span class="tile row__tile" style="--c:#10A37F;--on:#fff;">
+    <span class="tile__mono">GPT</span></span>
+    <div class="row__main"><a class="row__name" href="#san-pham">ChatGPT Plus 1 tháng</a><div class="row__fmt">» email|pass — tài khoản riêng, bảo hành 30 ngày</div></div>
+    <div class="row__type t12">NGUỒN API</div>
+    <div class="row__stock"><span class="stock"><i class="dot dot--ok"></i>Luôn có</span></div>
+    <div class="row__price tnum">120.000đ</div>
+    <div class="row__cta"><a class="buy " href="#san-pham"><span class="buy__label">Mua ngay</span><svg class="buy__arrow" viewBox="0 0 50 44" aria-hidden="true"><polygon points="7,.5 43,.5 49.5,22 43,43.5 7,43.5 .5,22"/><path d="M15 22h19M27 14.5l7.5 7.5-7.5 7.5"/></svg></a></div>
+  </div><div class="row">
+    <span class="tile row__tile" style="--c:#00C4CC;--on:#fff;">
+    <span class="tile__mono">Canva</span></span>
+    <div class="row__main"><a class="row__name" href="#san-pham">Canva Pro 1 năm</a><div class="row__fmt">» mời vào team — không cần mật khẩu</div></div>
+    <div class="row__type t12">KHO</div>
+    <div class="row__stock"><span class="stock"><i class="dot dot--ok"></i>8 còn</span></div>
+    <div class="row__price tnum">90.000đ</div>
+    <div class="row__cta"><a class="buy " href="#san-pham"><span class="buy__label">Mua ngay</span><svg class="buy__arrow" viewBox="0 0 50 44" aria-hidden="true"><polygon points="7,.5 43,.5 49.5,22 43,43.5 7,43.5 .5,22"/><path d="M15 22h19M27 14.5l7.5 7.5-7.5 7.5"/></svg></a></div>
+  </div><div class="row">
+    <span class="tile row__tile" style="--c:#111111;--on:#fff;">
+    <span class="tile__mono">CapCut</span></span>
+    <div class="row__main"><a class="row__name" href="#san-pham">CapCut Pro 1 tháng</a><div class="row__fmt">» email|pass — dùng trên điện thoại & PC</div></div>
+    <div class="row__type t12">KHO</div>
+    <div class="row__stock"><span class="stock"><i class="dot dot--ok"></i>20 còn</span></div>
+    <div class="row__price tnum">55.000đ</div>
+    <div class="row__cta"><a class="buy " href="#san-pham"><span class="buy__label">Mua ngay</span><svg class="buy__arrow" viewBox="0 0 50 44" aria-hidden="true"><polygon points="7,.5 43,.5 49.5,22 43,43.5 7,43.5 .5,22"/><path d="M15 22h19M27 14.5l7.5 7.5-7.5 7.5"/></svg></a></div>
+  </div>
+</section>
+</main>
+
+<div class="label t12"><span>Màn hình — Chi tiết sản phẩm</span><span>/san-pham/gmail-co-2015</span></div>
+<section class="pd x">
+  <div class="pd__thumbs"><span class="tile " style="--c:#EA4335;--on:#fff;">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg></span><span class="tile " style="--c:#4285F4;--on:#fff;">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg></span></div>
+  <div class="pd__media"><span class="tile " style="--c:#EA4335;--on:#fff;">
+    <span class="tile__tag">Gmail</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg><span class="tile__price">Kho · 17 còn</span></span></div>
+  <div class="pd__info">
+    <div class="t12 ink2" style="margin-bottom:14px">Trang chủ / Email / Gmail cổ 2015</div>
+    <h1>Gmail cổ 2015</h1>
+    <div class="pd__by">Email · Hàng kho</div>
+    <div class="pd__price tnum">15.000đ <span class="t12 ink2">/ tài khoản</span></div>
+    <dl class="spec"><dt>Định dạng</dt><dd class="mono">email|mật khẩu|email khôi phục</dd><dt>Tồn kho</dt><dd><i class="dot"></i>17 tài khoản</dd><dt>Giao hàng</dt><dd>Tự động, ngay khi thanh toán</dd><dt>Bảo hành</dt><dd>Đổi mới trong 24 giờ nếu sai mật khẩu</dd></dl>
+    <div class="qty"><span class="step"><button>−</button><span class="tnum">2</span><button>+</button></span><span class="t24 tnum">Tổng 30.000đ</span></div>
+    <a class="buy buy--lg" href="#san-pham"><span class="buy__label">Mua ngay</span><svg class="buy__arrow" viewBox="0 0 50 44" aria-hidden="true"><polygon points="7,.5 43,.5 49.5,22 43,43.5 7,43.5 .5,22"/><path d="M15 22h19M27 14.5l7.5 7.5-7.5 7.5"/></svg></a>
+    <div class="t12 ink2" style="margin-top:12px">Số dư <span class="money">150.000đ</span> — đủ để mua · <a href="#" style="color:var(--fg);text-decoration:underline">Nạp thêm</a></div>
+    <div class="tiers"><div><span>Thành viên</span><span class="tnum">15.000đ</span></div><div class="me"><span>CTV — giá của bạn</span><span class="tnum">13.000đ</span></div><div><span>Đại lý</span><span class="tnum">11.000đ</span></div></div>
+  </div>
+</section>
+
+<div class="label t12"><span>Màn hình — Mua nhanh (bấm MUA NGAY ở danh sách)</span><span>Panel trượt từ phải</span></div>
+<section class="panelwrap">
+  <div class="panel">
+    <a class="panel__close t12" href="#"><span>Đóng</span></a>
+    <div class="panel__body">
+      <div class="t12 ink2">Mua nhanh</div>
+      <div class="panel__item"><span class="tile " style="--c:#E50914;--on:#fff;">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5.398 0 8.348 23.602c2.346.059 4.856.398 4.856.398L10.113 0H5.398zm8.489 0v9.172l4.715 13.33V0h-4.715zM5.398 1.5V24c1.873-.225 2.81-.312 4.715-.398V14.83L5.398 1.5z"/></svg></span><div><div class="t24">Netflix Premium 1 tháng — 4K</div><div class="ink2" style="margin-top:6px">Nguồn API · giao trong vài giây</div></div></div>
+      <div class="qty" style="margin:0"><span class="step"><button>−</button><span class="tnum">1</span><button>+</button></span><span class="t12 ink2">Tối đa 50 / đơn</span></div>
+      <div class="sum"><span class="ink2">Đơn giá</span><span class="tnum">60.000đ</span><span class="ink2">Số dư sau khi mua</span><span class="tnum">90.000đ</span><span class="big">Tổng</span><span class="big tnum">60.000đ</span></div>
+      <div class="panel__foot"><a class="buy " href="#san-pham"><span class="buy__label">Thanh toán</span><svg class="buy__arrow" viewBox="0 0 50 44" aria-hidden="true"><polygon points="7,.5 43,.5 49.5,22 43,43.5 7,43.5 .5,22"/><path d="M15 22h19M27 14.5l7.5 7.5-7.5 7.5"/></svg></a><span class="t12 ink2">Tài khoản hiện ngay sau khi thanh toán, lưu trong Lịch sử.</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="label t12"><span>Màn hình — Đơn hàng đã mua</span><span>/don-hang/7</span></div>
+<section class="rc x">
+  <div class="rc__left">
+    <div class="t12"><i class="dot"></i>Hoàn thành</div>
+    <div class="t72" style="margin-top:14px">Đơn<br>#0007</div>
+    <div class="rc__meta"><div><div class="t12">Sản phẩm</div><div>Gmail cổ 2015</div></div><div><div class="t12">Số lượng</div><div class="tnum">2</div></div><div><div class="t12">Tổng tiền</div><div class="tnum">30.000đ</div></div><div><div class="t12">Thời gian</div><div class="tnum">00:05 · 21/10</div></div></div>
+  </div>
+  <div class="rc__right">
+    <div class="rc__bar"><span class="t12">Tài khoản đã mua (02)</span><span class="acts"><a class="chip" href="#">Sao chép tất cả</a><a class="chip" href="#">Tải .txt</a></span></div>
+    <div class="acc"><span class="t12 ink2 tnum">01</span><span class="mono">gmail1@example.com|Pass1000|recover1@example.com</span><a class="acc__copy" href="#">Sao chép</a></div>
+    <div class="acc"><span class="t12 ink2 tnum">02</span><span class="mono">gmail2@example.com|Pass1001|recover2@example.com</span><a class="acc__copy" href="#">Sao chép</a></div>
+  </div>
+</section>
+
+<div class="label t12"><span>Màn hình — Nạp tiền</span><span>/nap-tien</span></div>
+<section class="tu x">
+  <div class="tu__left">
+    <div class="t72">Nạp tiền</div>
+    <div class="steps"><div><span class="ink2 tnum">01</span><span>Chọn số tiền — hoặc tự nhập trong app ngân hàng</span></div><div><span class="ink2 tnum">02</span><span>Quét mã QR bằng app ngân hàng bất kỳ</span></div><div><span class="ink2 tnum">03</span><span>Giữ nguyên nội dung <span class="mono">NAP2</span> — tiền vào ví sau khoảng 1 phút</span></div></div>
+    <div class="amounts"><a href="#">50K</a><a class="on" href="#">100K</a><a href="#">200K</a><a href="#">500K</a><a href="#">1M</a><a href="#">Tùy ý</a></div>
+    <div class="wait"><i class="dot dot--warn pulse"></i>Đang chờ chuyển khoản — trang tự cập nhật</div>
+  </div>
+  <div class="tu__right">
+    <div class="qr"><img alt="VietQR" src="https://img.vietqr.io/image/MB-0000000000-qr_only.png?amount=100000&addInfo=NAP2"></div>
+    <dl class="kv"><dt>Ngân hàng</dt><dd>MB Bank</dd><span></span><dt>Số tài khoản</dt><dd class="mono">0000000000</dd><a class="cp" href="#">Sao chép</a><dt>Chủ tài khoản</dt><dd>SHOP WEB12</dd><span></span><dt>Số tiền</dt><dd class="tnum">100.000đ</dd><span></span><dt>Nội dung</dt><dd class="memo">NAP2</dd><a class="cp" href="#">Sao chép</a></dl>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="foot__cols t12">
+    <p style="text-transform:none;font-size:14px">Congcure® — kho tài khoản số giao tự động. Nạp VietQR, nhận hàng tức thì, hoàn tiền khi nguồn lỗi.</p>
+    <div><div class="ink2" style="margin-bottom:8px">Mua sắm</div><a href="#">Email</a><a href="#">Mạng xã hội</a><a href="#">Giải trí</a><a href="#">AI & Công cụ</a></div>
+    <div><div class="ink2" style="margin-bottom:8px">Hỗ trợ</div><a href="#">Chính sách</a><a href="#">FAQ</a><a href="#">API đại lý</a><a href="#">Công cụ 2FA</a></div>
+    <div><div class="ink2" style="margin-bottom:8px">Liên hệ</div><a href="#">Telegram @congcure ↗</a><a href="#">Kênh thông báo ↗</a><span class="ink2" style="font-size:14px">09:00 — 22:00 mỗi ngày</span></div>
+  </div>
+  <div class="giant">Congcure<sup>®</sup></div>
+  <div class="foot__bar t12"><span>© 2026 Congcure</span><span><i class="dot"></i>Tất cả hệ thống hoạt động</span></div>
+</footer>
+</body></html>
