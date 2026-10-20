@@ -1,0 +1,24 @@
+{
+  "name": "web12",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.12" },
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "db:start": "npm run start -w @web12/db",
+    "db:migrate": "npm run migrate -w @web12/db",
+    "db:seed": "npm run seed -w @web12/core",
+    "test": "npm test -w @web12/core",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "dev": "npm run dev -w @web12/web",
+    "worker": "npm run start -w @web12/worker",
+    "mock:supplier": "npm run start -w @web12/mock-supplier",
+    "fake:topup": "node --env-file=.env scripts/fake-topup.mjs",
+    "api:smoke": "node scripts/api-smoke.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "5.9.3"
+  }
+}
