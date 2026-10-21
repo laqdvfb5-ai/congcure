@@ -14,6 +14,13 @@ congcure.shop {
     }
 }
 
+www.congcure.shop {
+    tls {
+        issuer acme
+    }
+    redir https://congcure.shop{uri} permanent
+}
+
 # Temporary preview while the domain's DNS is being configured.
 http://160.187.246.148 {
     encode gzip

@@ -2,7 +2,8 @@
 
 Production uses PostgreSQL on loopback, Node.js 24, Caddy, and two systemd services.
 
-- Domain: `congcure.shop`; DNS A record: `160.187.246.148`.
+- Domains: `congcure.shop` and `www.congcure.shop`; both DNS A records: `160.187.246.148`.
+- `www.congcure.shop` redirects to `https://congcure.shop`, preserving the request URI.
 - Releases: `/opt/congcure/releases/<revision>`; active symlink: `/opt/congcure/current`.
 - Environment: `/etc/congcure/app.env`, readable only by root and the application group.
 - Images: `/var/lib/congcure/products`, independent of releases.
