@@ -1,0 +1,21 @@
+congcure.shop {
+    tls {
+        issuer acme
+    }
+    encode zstd gzip
+    request_body {
+        max_size 6MB
+    }
+    reverse_proxy 127.0.0.1:3000
+    header {
+        X-Content-Type-Options nosniff
+        Referrer-Policy strict-origin-when-cross-origin
+        -Server
+    }
+}
+
+# Temporary preview while the domain's DNS is being configured.
+http://160.187.246.148 {
+    encode gzip
+    reverse_proxy 127.0.0.1:3000
+}

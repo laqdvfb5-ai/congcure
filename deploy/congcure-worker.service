@@ -1,0 +1,22 @@
+[Unit]
+Description=Congcure order worker
+After=network.target postgresql.service
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=congcure
+Group=congcure
+WorkingDirectory=/opt/congcure/current
+EnvironmentFile=/etc/congcure/app.env
+ExecStart=/usr/local/bin/node --import tsx apps/worker/src/main.ts
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=60
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+UMask=0027
+
+[Install]
+WantedBy=multi-user.target
