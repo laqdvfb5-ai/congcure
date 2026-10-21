@@ -1,97 +1,159 @@
-import { randomUUID } from 'node:crypto';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { Flash } from '@/components/Flash';
-import { core } from '@/lib/core';
-import { formatVnd, TIER_LABEL, TYPE_LABEL } from '@/lib/format';
-import { getCurrentUser } from '@/lib/session';
-import { buyAction } from './actions';
+import { randomUUID } from "node:crypto";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ChevronRight, ShoppingBag, ShieldCheck } from "lucide-react";
+import { ProductCover } from "@/components/ProductCover";
+import { ProductRow } from "@/components/ProductRow";
+import { PurchaseForm } from "@/components/Purchase";
+import { Flash } from "@/components/Flash";
+import { core } from "@/lib/core";
+import { formatVnd, formatStock, TIER_LABEL } from "@/lib/format";
+import { getCurrentUser } from "@/lib/session";
 
 export default async function ProductPage({
-  params, searchParams,
-}: { params: Promise<{ slug: string }>; searchParams: Promise<Record<string, string>> }) {
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string>>;
+}) {
   const { slug } = await params;
-  const product = await core.getProductBySlug(slug);
+  const product = await core.getProductBySlug(slug, {
+    includeSupplierStock: true,
+  });
   if (!product || !product.active) notFound();
-  const [user, categories] = await Promise.all([getCurrentUser(), core.listCategories()]);
+  const [user, categories, related, suppliers] = await Promise.all([
+    getCurrentUser(),
+    core.listCategories(),
+    core.listProducts({
+      categoryId: product.categoryId,
+      includeSupplierStock: true,
+    }),
+    core.listSuppliers(),
+  ]);
   const category = categories.find((c) => c.id === product.categoryId);
-  const tier = user?.tier ?? 'MEMBER';
+  const tier = user?.tier ?? "MEMBER";
   const price = core.priceForTier(product, tier);
-  const maxQty = product.type === 'UNIQUE' ? 1 : Math.min(100, product.stock ?? 100);
-  const soldOut = product.stock === 0;
-  const attributes = Object.entries(product.attributes);
-
+  const maxFor = (supplierId: number | null) =>
+    suppliers.find((s) => s.id === supplierId)?.adapter === "shoptaikhoan"
+      ? 50
+      : 100;
   return (
-    <div className="space-y-8">
-      <div className="eyebrow">
-        <Link href="/" className="hover:text-fg">Trang chủ</Link> /{' '}
-        {category && <Link href={`/danh-muc/${category.slug}`} className="hover:text-fg">{category.name}</Link>}
-      </div>
-
-      <div className="grid gap-10 md:grid-cols-[1.4fr_1fr]">
-        <div className="space-y-6">
-          <h1 className="display text-5xl md:text-7xl">{product.name}</h1>
-          <div className="flex flex-wrap gap-2">
-            <span className="badge">{TYPE_LABEL[product.type]}</span>
-            <span className={`badge ${soldOut ? 'border-accent text-accent' : ''}`}>
-              {product.stock === null ? 'Kho: luôn có' : soldOut ? 'Hết hàng' : `Kho hàng: ${product.stock.toLocaleString('vi-VN')}`}
-            </span>
-          </div>
-          {product.images.length > 0 && (
-            <div className="grid gap-3 sm:grid-cols-2">
-              {product.images.map((src) => <img key={src} src={src} alt="" className="w-full rounded-2xl border border-line" />)}
-            </div>
-          )}
-          {product.description && (
+    <>
+      <nav className="breadcrumb" aria-label="Đường dẫn">
+        <Link href="/">Kho tài khoản</Link>
+        <ChevronRight size={13} />
+        {category && (
+          <>
+            <Link href={"/danh-muc/" + category.slug}>{category.name}</Link>
+            <ChevronRight size={13} />
+          </>
+        )}
+        <span>{product.name}</span>
+      </nav>
+      <Flash searchParams={await searchParams} />
+      <div className="product-detail">
+        <section className="product-info">
+          <ProductCover product={product} large />
+          <p className="eyebrow mt-6">{category?.name}</p>
+          <h1>{product.name}</h1>
+          <p className="product-description">
+            {product.description ||
+              "Thông tin chi tiết đang được cửa hàng cập nhật."}
+          </p>
+          <dl className="product-specs">
             <div>
-              <div className="eyebrow mb-2">Mô tả</div>
-              <p className="whitespace-pre-line leading-relaxed">{product.description}</p>
+              <dt>Giao hàng</dt>
+              <dd>Nhận tại trang đơn hàng sau thanh toán</dd>
             </div>
-          )}
-          {attributes.length > 0 && (
-            <dl className="divide-y divide-line border-y border-line">
-              {attributes.map(([k, v]) => (
-                <div key={k} className="flex justify-between py-2 text-sm">
-                  <dt className="text-muted">{k}</dt><dd className="font-mono">{v}</dd>
-                </div>
-              ))}
-            </dl>
-          )}
-        </div>
-
-        <aside className="h-fit space-y-5 rounded-2xl border border-fg p-6 md:sticky md:top-6">
-          <div>
-            <div className="eyebrow">Giá {TIER_LABEL[tier]}</div>
-            <div className="price text-5xl">{formatVnd(price)}</div>
+            <div>
+              <dt>Tồn kho</dt>
+              <dd>{formatStock(product.stock)}</dd>
+            </div>
+            {Object.entries(product.attributes).map(([key, value]) => (
+              <div key={key}>
+                <dt>{key}</dt>
+                <dd>{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+        <aside className="purchase-panel">
+          <div className="flex items-center justify-between gap-3">
+            <span className="eyebrow">Giá {TIER_LABEL[tier]}</span>
+            {product.stock !== null && (
+              <span
+                className={
+                  "stock-badge " + (product.stock === 0 ? "empty" : "")
+                }
+              >
+                <span className="status-dot" />
+                {product.stock === 0
+                  ? "Hết hàng"
+                  : "Còn " + formatStock(product.stock)}
+              </span>
+            )}
           </div>
-          <Flash searchParams={await searchParams} />
-          {!user ? (
-            <Link href="/dang-nhap" className="btn w-full">Đăng nhập để mua</Link>
-          ) : soldOut ? (
-            <span className="btn pointer-events-none w-full opacity-40">Hết hàng</span>
+          <div className="price-large">
+            {formatVnd(price)} <small>/ tài khoản</small>
+          </div>
+          <div className="tier-grid">
+            {core.TIERS.map((t) => (
+              <div key={t} className={t === tier ? "current" : ""}>
+                <small>{TIER_LABEL[t]}</small>
+                <b>{formatVnd(core.priceForTier(product, t))}</b>
+              </div>
+            ))}
+          </div>
+          {product.stock === 0 ? (
+            <div className="notice">
+              Sản phẩm đang hết hàng. Vui lòng quay lại sau.
+            </div>
+          ) : user ? (
+            <PurchaseForm
+              product={{
+                id: product.id,
+                slug,
+                name: product.name,
+                price,
+                stock: product.stock,
+                maxQuantity:
+                  product.type === "UNIQUE" ? 1 : maxFor(product.supplierId),
+              }}
+              balance={user.balance}
+              requestId={randomUUID()}
+            />
           ) : (
-            <form action={buyAction} className="space-y-3">
-              <input type="hidden" name="productId" value={product.id} />
-              <input type="hidden" name="slug" value={product.slug} />
-              <input type="hidden" name="requestId" value={randomUUID()} />
-              <label className="block">
-                <span className="eyebrow">Số lượng</span>
-                <input name="quantity" type="number" min={1} max={maxQty} defaultValue={1}
-                  readOnly={product.type === 'UNIQUE'} className="input mt-1 font-mono" />
-              </label>
-              <button className="btn w-full">Mua ngay</button>
-              <p className="text-xs text-muted">
-                Số dư: <span className="font-mono">{formatVnd(user.balance)}</span> ·{' '}
-                <Link href="/nap-tien" className="link">Nạp thêm</Link>
-              </p>
-            </form>
+            <Link href="/dang-nhap" className="btn w-full">
+              <ShoppingBag size={17} />
+              Đăng nhập để mua
+            </Link>
           )}
-          <ul className="space-y-1 border-t border-line pt-4 text-xs text-muted">
-            <li>✓ Giao tài khoản ngay sau khi thanh toán</li>
-            <li>✓ Xem lại tài khoản bất kỳ lúc nào trong Lịch sử</li>
-          </ul>
+          <div className="dialog-note">
+            <ShieldCheck size={15} />
+            <Link href="/chinh-sach">Chính sách giao hàng & hoàn tiền</Link>
+          </div>
         </aside>
       </div>
-    </div>
+      {related.some((p) => p.id !== product.id) && (
+        <section className="section-block">
+          <h2>Cùng danh mục</h2>
+          <div className="catalog-surface">
+            {related
+              .filter((p) => p.id !== product.id)
+              .slice(0, 4)
+              .map((p) => (
+                <ProductRow
+                  key={p.id}
+                  product={p}
+                  tier={tier}
+                  balance={user?.balance ?? null}
+                  maxQuantity={maxFor(p.supplierId)}
+                />
+              ))}
+          </div>
+        </section>
+      )}
+    </>
   );
 }

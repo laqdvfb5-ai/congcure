@@ -8,8 +8,11 @@ export function createGenericRestAdapter(cfg: { baseUrl: string; apiKey: string;
     try {
       res = await fetch(`${base}${path}`, {
         ...init,
+        cache: 'no-store',
         headers: { 'content-type': 'application/json', 'x-api-key': cfg.apiKey },
-        signal: AbortSignal.timeout(cfg.timeoutMs ?? 15_000),
+        signal: init.signal
+          ? AbortSignal.any([init.signal, AbortSignal.timeout(cfg.timeoutMs ?? 15_000)])
+          : AbortSignal.timeout(cfg.timeoutMs ?? 15_000),
       });
     } catch (err) {
       throw new SupplierError(`Không kết nối được nhà cung cấp: ${(err as Error).message}`, true);
@@ -36,9 +39,10 @@ export function createGenericRestAdapter(cfg: { baseUrl: string; apiKey: string;
       throw new SupplierError('Phản hồi không hợp lệ từ nhà cung cấp', true);
     },
 
-    async listProducts() {
-      const body = await call<{ products?: SupplierProduct[] }>('/api/products');
-      return body.products ?? [];
+    async listProducts(opts = {}) {
+      const body = await call<{ products?: SupplierProduct[] }>('/api/products', { signal: opts.signal });
+      if (!Array.isArray(body.products)) throw new SupplierError('Phản hồi danh mục không hợp lệ', true);
+      return body.products;
     },
   };
 }

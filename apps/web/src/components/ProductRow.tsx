@@ -1,35 +1,61 @@
-import Link from 'next/link';
-import type { Product, Tier } from '@web12/core';
-import { core } from '@/lib/core';
-import { formatVnd, TYPE_LABEL } from '@/lib/format';
+import Link from "next/link";
+import type { Product, Tier } from "@web12/core";
+import { ProductThumbnail } from "./ProductCover";
+import { BuyButton } from "./Purchase";
+import { formatVnd, formatStock } from "@/lib/format";
+import { core } from "@/lib/core";
 
-/** First line of the description, used as the "định dạng" hint (mixmmo-style row). */
-function summary(p: Product): string {
-  return p.description.split(/\r?\n/).find((l) => l.trim())?.trim() ?? '';
-}
-
-export function ProductRow({ product, tier }: { product: Product; tier: Tier }) {
-  const soldOut = product.stock === 0;
-  const href = `/san-pham/${product.slug}`;
+export function ProductRow({
+  product,
+  tier,
+  balance = null,
+  maxQuantity = 100,
+}: {
+  product: Product;
+  tier: Tier;
+  balance?: number | null;
+  maxQuantity?: number;
+}) {
+  const price = core.priceForTier(product, tier);
   return (
-    <div className="grid gap-4 border-b border-line py-5 md:grid-cols-[1fr_auto] md:items-center">
-      <div className="min-w-0 space-y-2">
-        <Link href={href} className="block text-lg font-medium leading-snug hover:text-accent">{product.name}</Link>
-        {summary(product) && <p className="line-clamp-1 text-sm text-muted">» {summary(product)}</p>}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="badge">{TYPE_LABEL[product.type]}</span>
-          <span className={`badge ${soldOut ? 'border-accent text-accent' : ''}`}>
-            {product.stock === null ? 'Kho: luôn có' : soldOut ? 'Hết hàng' : `Kho hàng: ${product.stock.toLocaleString('vi-VN')}`}
-          </span>
+    <div className={"product-row" + (product.stock === 0 ? " sold-out" : "")}>
+      <div className="product-identity">
+        <ProductThumbnail product={product} />
+        <div>
+          <Link href={"/san-pham/" + product.slug} className="product-name">
+            {product.name}
+          </Link>
+          <p>{product.description.split(/\r?\n/)[0]}</p>
         </div>
       </div>
-      <div className="flex items-center gap-3 md:w-64 md:flex-col md:items-stretch">
-        <div className="price flex-1 rounded-full border border-line px-4 py-2 text-center text-lg">
-          {formatVnd(core.priceForTier(product, tier))}
-        </div>
-        {soldOut
-          ? <span className="btn pointer-events-none flex-1 opacity-40">Hết hàng</span>
-          : <Link href={href} className="btn flex-1">Mua ngay</Link>}
+      <div className="product-stock">
+        <span
+          className={
+            "stock-badge " +
+            (product.stock === null || product.stock === 0 ? "empty" : "")
+          }
+          aria-label={"Tồn kho: " + formatStock(product.stock)}
+        >
+          <span className="status-dot" />
+          {formatStock(product.stock)}
+        </span>
+      </div>
+      <div className="product-price">
+        {formatVnd(price)}
+        <small>/ tài khoản</small>
+      </div>
+      <div className="product-action">
+        <BuyButton
+          product={{
+            id: product.id,
+            name: product.name,
+            slug: product.slug,
+            price,
+            stock: product.stock,
+            maxQuantity: product.type === "UNIQUE" ? 1 : maxQuantity,
+          }}
+          balance={balance}
+        />
       </div>
     </div>
   );

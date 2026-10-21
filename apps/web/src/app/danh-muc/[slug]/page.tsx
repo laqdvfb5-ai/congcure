@@ -1,32 +1,23 @@
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { ProductRow } from '@/components/ProductRow';
-import { core } from '@/lib/core';
-import { getCurrentUser } from '@/lib/session';
+import { notFound } from "next/navigation";
+import { Catalog } from "@/components/Catalog";
+import { core } from "@/lib/core";
 
-export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function CategoryPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ q?: string; sort?: string; available?: string }>;
+}) {
   const { slug } = await params;
-  const category = await core.getCategoryBySlug(slug);
-  if (!category) notFound();
-  const [user, categories, products] = await Promise.all([
-    getCurrentUser(), core.listCategories(), core.listProducts({ categoryId: category.id }),
-  ]);
+  if (!(await core.getCategoryBySlug(slug))) notFound();
+  const sp = await searchParams;
   return (
-    <div className="space-y-8">
-      <nav className="flex flex-wrap gap-2">
-        <Link href="/#san-pham" className="pill">Tất cả sản phẩm</Link>
-        {categories.map((c) => (
-          <Link key={c.id} href={`/danh-muc/${c.slug}`} className={`pill ${c.id === category.id ? 'pill-active' : ''}`}>{c.name}</Link>
-        ))}
-      </nav>
-      <section>
-        <div className="flex items-end justify-between border-b-2 border-fg pb-2">
-          <h1 className="display text-5xl md:text-7xl">{category.name}</h1>
-          <span className="eyebrow">{products.length} sản phẩm</span>
-        </div>
-        {products.map((p) => <ProductRow key={p.id} product={p} tier={user?.tier ?? 'MEMBER'} />)}
-        {products.length === 0 && <p className="py-16 text-center text-muted">Danh mục chưa có sản phẩm.</p>}
-      </section>
-    </div>
+    <Catalog
+      categorySlug={slug}
+      q={sp.q?.trim()}
+      sort={sp.sort}
+      available={sp.available === "1"}
+    />
   );
 }

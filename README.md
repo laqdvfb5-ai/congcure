@@ -70,6 +70,39 @@ Lỗi trả về dạng `{ "error": { "code", "message" } }`.
 
 Khi khách mua, worker gọi API nguồn (mỗi đơn có `Idempotency-Key` riêng nên không bị mua trùng) và giao tài khoản ngay. Nếu nguồn hết hàng hoặc hết số dư, đơn tự hoàn tiền và lý do hiện ở `/admin/don-hang`. Mỗi đơn tối đa 50 món, theo giới hạn của nguồn.
 
+## Tồn kho
+
+Danh sách sản phẩm, trang chi tiết và API đại lý lấy tồn kho theo SKU. Riêng ShopTaiKhoan, số lượng hiển thị được đọc từ trường tồn kho trên trang sản phẩm công khai, vì Seller API chỉ trả kho nội bộ và có thể khác số lượng website. SKU được đối chiếu qua JSON-LD trước khi nhận số lượng; không gửi API key khi đọc trang công khai. Các adapter khác dùng danh mục API của nguồn.
+
+Kết quả từ nguồn được lưu đệm 30 giây; các lượt đọc đồng thời dùng chung một yêu cầu. Giá bán vẫn lấy từ cấu hình sản phẩm của cửa hàng. Việc đặt đơn vẫn dùng Seller API; tồn kho website không đồng nghĩa với việc sản phẩm đã được cho phép mua qua API.
+
+Số 0 chỉ dùng khi có số lượng xác nhận hết hàng. Nếu không đọc được dữ liệu, trang nguồn chưa tải xong, SKU không khớp hoặc định dạng số lượng không hợp lệ, giao diện hiện `Chưa cập nhật` và API đại lý trả `stock: null`. Bộ lọc `Còn hàng` chỉ chọn sản phẩm có số lượng đã xác định lớn hơn 0.
+
+## Ảnh sản phẩm
+
+Trong form tạo/sửa sản phẩm, chọn ảnh từ máy tính (JPG, PNG hoặc WebP, tối đa 5 MB/ảnh và 8 ảnh/sản phẩm), chọn ảnh chính rồi lưu sản phẩm. Ảnh được xử lý thành WebP, cạnh dài tối đa 1600px. URL ảnh cũ vẫn dùng được.
+
+Ảnh tải lên được lưu tại `apps/web/.uploads/products` khi chạy bằng lệnh workspace. Có thể đặt `PRODUCT_IMAGE_DIR` thành đường dẫn tuyệt đối đến thư mục lưu trữ bền vững. Khi triển khai hoặc sao lưu, giữ thư mục này cùng database; không đặt nó trong thư mục build tạm. Xóa ảnh khỏi form chỉ bỏ ảnh khỏi sản phẩm, không xóa file đang lưu.
+
+## Kiểm tra giao diện
+
+Giao diện có mua nhanh, chọn số tiền VietQR, cập nhật ví/đơn hàng, công cụ 2FA và chế độ sáng/tối.
+
+```bash
+npm test
+npx playwright install chromium
+npm run test:e2e -w @web12/web
+```
+
+Test giao diện tự chạy web ở cổng 3002, tạo dữ liệu riêng trong `DATABASE_URL_TEST` và giả lập ảnh QR. Không gọi mua hàng từ nguồn thật. Cần chạy `db:start` trước. Có thể đặt `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` nếu dùng Chrome đã cài trên máy.
+
+Để chạy một bản xem trước song song trên PowerShell:
+
+```powershell
+$env:WEB12_DIST_DIR = '.next/preview'
+npm exec -w @web12/web -- next dev -p 3001
+```
+
 ## Production
 
 - Đặt `DATABASE_URL` trỏ tới Postgres thật, rồi chạy `npm run db:migrate`.

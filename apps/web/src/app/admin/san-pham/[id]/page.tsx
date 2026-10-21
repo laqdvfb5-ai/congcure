@@ -1,33 +1,74 @@
-import { notFound } from 'next/navigation';
-import { Flash } from '@/components/Flash';
-import { core } from '@/lib/core';
-import { addStockAction } from '../../actions';
-import { ProductForm } from '../ProductForm';
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ArrowLeft, Upload } from "lucide-react";
+import { Flash } from "@/components/Flash";
+import { SubmitButton } from "@/components/SubmitButton";
+import { PageHeading } from "@/components/ui";
+import { core } from "@/lib/core";
+import { addStockAction } from "../../actions";
+import { ProductForm } from "../ProductForm";
 
 export default async function EditProduct({
-  params, searchParams,
-}: { params: Promise<{ id: string }>; searchParams: Promise<Record<string, string>> }) {
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string>>;
+}) {
   const product = await core.getProduct(Number((await params).id));
   if (!product) notFound();
-  const [categories, suppliers] = await Promise.all([core.listCategories(), core.listSuppliers()]);
+  const [categories, suppliers] = await Promise.all([
+    core.listCategories(),
+    core.listSuppliers(),
+  ]);
   return (
-    <div className="space-y-6">
-      <div className="card space-y-4">
-        <h1 className="text-xl font-semibold">Sửa: {product.name}</h1>
-        <Flash searchParams={await searchParams} />
-        <ProductForm product={product} categories={categories} suppliers={suppliers} />
-      </div>
-      {product.type !== 'API' && (
-        <div className="card space-y-3">
-          <h2 className="font-semibold">Nhập kho (đang còn {product.stock})</h2>
-          <form action={addStockAction} className="space-y-2">
+    <>
+      <PageHeading
+        eyebrow={"QUẢN TRỊ / SẢN PHẨM #" + product.id}
+        title={product.name}
+      >
+        <Link href="/admin/san-pham" className="btn-secondary">
+          <ArrowLeft size={15} />
+          Danh sách
+        </Link>
+      </PageHeading>
+      <Flash searchParams={await searchParams} />
+      <ProductForm
+        product={product}
+        categories={categories}
+        suppliers={suppliers}
+      />
+      {product.type !== "API" && (
+        <section className="section-block">
+          <h2>
+            Nhập kho{" "}
+            <span className="text-muted text-sm">/ {product.stock} có sẵn</span>
+          </h2>
+          <form action={addStockAction} className="card form-stack">
             <input type="hidden" name="productId" value={product.id} />
-            <textarea name="lines" rows={8} className="input font-mono text-sm"
-              placeholder={product.type === 'UNIQUE' ? 'Đúng 1 dòng: user|pass|...' : 'Mỗi dòng 1 tài khoản, ví dụ: email|matkhau|2fa'} />
-            <button className="btn">Nhập kho</button>
+            <label className="field">
+              Danh sách tài khoản
+              <textarea
+                name="lines"
+                rows={7}
+                required
+                className="input font-mono text-xs"
+                placeholder={
+                  product.type === "UNIQUE"
+                    ? "Một dòng: user|pass|..."
+                    : "Mỗi dòng một tài khoản: email|matkhau|2fa"
+                }
+              />
+            </label>
+            <div>
+              <SubmitButton>
+                <Upload size={16} />
+                Nhập tài khoản
+              </SubmitButton>
+            </div>
           </form>
-        </div>
+        </section>
       )}
-    </div>
+    </>
   );
 }

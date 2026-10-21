@@ -1,47 +1,87 @@
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import type { SupplierProduct } from '@web12/core';
-import { core } from '@/lib/core';
-import { formatVnd } from '@/lib/format';
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ArrowLeft, Search } from "lucide-react";
+import type { SupplierProduct } from "@web12/core";
+import { PageHeading, EmptyState } from "@/components/ui";
+import { core } from "@/lib/core";
+import { formatVnd } from "@/lib/format";
 
 export default async function SupplierProducts({
-  params, searchParams,
-}: { params: Promise<{ id: string }>; searchParams: Promise<Record<string, string>> }) {
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string>>;
+}) {
   const supplier = await core.getSupplier(Number((await params).id));
   if (!supplier) notFound();
-  const q = (await searchParams).q?.trim() ?? '';
-
+  const q = (await searchParams).q?.trim() ?? "";
   let products: SupplierProduct[] = [];
   let error: string | null = null;
   try {
-    products = await (await core.getAdapterForSupplier(supplier.id)).listProducts({ q: q || undefined });
+    products = await (
+      await core.getAdapterForSupplier(supplier.id)
+    ).listProducts({ q: q || undefined });
   } catch (e) {
-    error = e instanceof Error ? e.message : 'Không lấy được danh sách sản phẩm';
+    error =
+      e instanceof Error ? e.message : "Không lấy được danh sách sản phẩm";
   }
-
   return (
-    <div className="card space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Sản phẩm nguồn: {supplier.name}</h1>
-        <Link href="/admin/nha-cung-cap" className="text-sm link">← Nhà cung cấp</Link>
+    <>
+      <PageHeading
+        eyebrow="QUẢN TRỊ / SẢN PHẨM NGUỒN"
+        title={supplier.name}
+        description="Dùng mã SKU khi tạo sản phẩm API trong cửa hàng."
+      >
+        <Link href="/admin/nha-cung-cap" className="btn-secondary">
+          <ArrowLeft size={15} />
+          Nhà cung cấp
+        </Link>
+      </PageHeading>
+      {error && (
+        <div className="notice notice-error" role="alert">
+          {error}
+        </div>
+      )}
+      <div className="table-surface">
+        <form className="table-toolbar">
+          <label className="search-field">
+            <Search size={17} />
+            <input
+              name="q"
+              defaultValue={q}
+              placeholder="Tìm sản phẩm nguồn…"
+              aria-label="Tìm sản phẩm nguồn"
+            />
+          </label>
+          <button className="btn-secondary btn-sm">Tìm kiếm</button>
+        </form>
+        <div className="scroll-table">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>SKU</th>
+                <th>Tên sản phẩm</th>
+                <th>Giá vốn</th>
+                <th>Tồn kho</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((p) => (
+                <tr key={p.sku}>
+                  <td className="font-mono text-xs">{p.sku}</td>
+                  <td>{p.name}</td>
+                  <td className="nowrap">{formatVnd(p.price)}</td>
+                  <td>{p.stock ?? "Chưa xác định"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {!error && products.length === 0 && (
+          <EmptyState title="Không có sản phẩm phù hợp" />
+        )}
       </div>
-      <form className="flex gap-2">
-        <input name="q" defaultValue={q} placeholder="Tìm sản phẩm (vd: Netflix)" className="input" />
-        <button className="btn-secondary">Tìm</button>
-      </form>
-      {error && <div className="rounded bg-accent/10 px-3 py-2 text-sm text-accent">{error}</div>}
-      <p className="text-xs text-muted">
-        Tạo sản phẩm loại API trên web, chọn nhà cung cấp này và điền cột SKU vào ô &quot;SKU bên nguồn&quot;.
-      </p>
-      <table className="table">
-        <thead><tr><th>SKU</th><th>Tên</th><th>Giá vốn</th><th>Tồn</th></tr></thead>
-        <tbody>
-          {products.map((p) => (
-            <tr key={p.sku}><td className="font-mono">{p.sku}</td><td>{p.name}</td><td>{formatVnd(p.price)}</td><td>{p.stock ?? '∞'}</td></tr>
-          ))}
-        </tbody>
-      </table>
-      {!error && products.length === 0 && <p className="text-sm text-muted">Không có sản phẩm.</p>}
-    </div>
+    </>
   );
 }

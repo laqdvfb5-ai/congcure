@@ -1,47 +1,95 @@
-import { site } from '@/lib/site';
+import {
+  PackageCheck,
+  RotateCcw,
+  ShieldCheck,
+  Plus,
+  ArrowUpRight,
+} from "lucide-react";
+import { PageHeading } from "@/components/ui";
+import { site } from "@/lib/site";
 
-export const metadata = { title: `Chính sách · ${site.logo}` };
-
-const POLICIES = [
-  ['Giao hàng', 'Tài khoản được giao tự động ngay sau khi thanh toán bằng số dư ví. Bạn xem lại bất kỳ lúc nào trong mục Lịch sử.'],
-  ['Hoàn tiền', 'Đơn lấy từ nguồn mà thất bại sẽ được hoàn tiền tự động vào ví. Tài khoản lỗi khi nhận: liên hệ hỗ trợ trong 24 giờ, kèm mã đơn.'],
-  ['Bảo mật', 'Thông tin tài khoản đã mua được mã hóa khi lưu trữ. Không chia sẻ mật khẩu và khóa API của bạn cho người khác.'],
+export const metadata = { title: "Chính sách & hỗ trợ" };
+const policies = [
+  {
+    icon: PackageCheck,
+    title: "Giao hàng tự động",
+    body: "Đơn hàng được xử lý tự động sau khi thanh toán bằng ví. Thông tin tài khoản sẽ hiển thị khi giao hàng hoàn tất. Bạn có thể xem lại trong mục Đơn hàng.",
+  },
+  {
+    icon: RotateCcw,
+    title: "Hoàn tiền & hỗ trợ",
+    body: "Nếu đơn hàng không thể hoàn tất, số tiền đã thanh toán được hoàn lại vào ví. Nếu tài khoản có lỗi khi nhận, liên hệ hỗ trợ trong 24 giờ, kèm mã đơn để được kiểm tra.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Bảo mật tài khoản",
+    body: "Thông tin tài khoản đã mua được mã hóa khi lưu trữ. Giữ kín mật khẩu và khóa API của bạn; thu hồi ngay khóa API không còn sử dụng.",
+  },
 ];
-
-const FAQ = [
-  ['Nạp tiền bao lâu thì vào ví?', 'Thường dưới 1 phút sau khi chuyển khoản đúng nội dung. Ghi sai nội dung thì nhắn hỗ trợ để được cộng tay.'],
-  ['Có API cho đại lý không?', 'Có. Tạo khóa ở trang Tài khoản; tài liệu nằm ngay dưới phần khóa API.'],
-  ['Giá CTV / Đại lý là gì?', 'Tài khoản cấp CTV và Đại lý được giá thấp hơn. Liên hệ hỗ trợ để nâng cấp.'],
+const faq = [
+  [
+    "Nạp tiền bao lâu thì vào ví?",
+    "Tiền thường được ghi nhận sau khi ngân hàng gửi thông báo giao dịch. Giữ đúng nội dung NAP của bạn khi chuyển khoản. Nếu chưa nhận được tiền, liên hệ cửa hàng kèm mã giao dịch.",
+  ],
+  [
+    "Ghi sai nội dung chuyển khoản thì sao?",
+    "Gửi ảnh giao dịch, số tiền và email tài khoản cho hỗ trợ Telegram. Cửa hàng sẽ đối chiếu và ghi nhận giao dịch cho bạn.",
+  ],
+  [
+    "Đơn hàng đang xử lý, tôi cần làm gì?",
+    "Giữ trang chi tiết đơn hàng mở để theo dõi trạng thái. Khi giao xong, thông tin tài khoản sẽ xuất hiện. Không đặt lại cùng đơn khi chưa rõ kết quả.",
+  ],
+  [
+    "Làm thế nào để dùng API đại lý?",
+    "Đăng nhập, mở mục Tài khoản & API rồi tạo khóa riêng. Các endpoint và mẫu yêu cầu nằm ngay trong trang này.",
+  ],
+  [
+    "Làm sao để nhận giá CTV hoặc Đại lý?",
+    "Liên hệ hỗ trợ để trao đổi nhu cầu và nâng cấp tài khoản. Giá theo cấp được áp dụng tự động khi bạn mua hàng.",
+  ],
 ];
-
 export default function PolicyPage() {
   return (
-    <div className="space-y-16">
-      <section>
-        <h1 className="display border-b-2 border-fg pb-2 text-5xl md:text-7xl">Chính sách</h1>
-        <div className="grid gap-8 pt-8 md:grid-cols-3">
-          {POLICIES.map(([title, body]) => (
-            <div key={title}>
-              <div className="eyebrow mb-2">{title}</div>
-              <p className="leading-relaxed">{body}</p>
-            </div>
-          ))}
-        </div>
+    <div className="policy-layout">
+      <PageHeading
+        eyebrow="THÔNG TIN CỬA HÀNG"
+        title="Chính sách & hỗ trợ"
+        description="Thông tin về giao hàng, thanh toán và tài khoản của bạn."
+      />
+      <section className="policy-grid">
+        {policies.map(({ icon: Icon, title, body }) => (
+          <div className="policy-item" key={title}>
+            <Icon size={25} strokeWidth={1.5} />
+            <h2>{title}</h2>
+            <p>{body}</p>
+          </div>
+        ))}
       </section>
-      <section id="faq" className="scroll-mt-6">
-        <h2 className="display border-b-2 border-fg pb-2 text-5xl md:text-7xl">FAQ</h2>
-        {FAQ.map(([q, a]) => (
-          <details key={q} className="group border-b border-line py-4">
-            <summary className="flex cursor-pointer list-none items-center justify-between text-lg">
-              {q}<span className="font-mono transition-transform group-open:rotate-45">+</span>
+      <section id="faq">
+        <h2>Câu hỏi thường gặp</h2>
+        {faq.map(([q, a]) => (
+          <details className="faq-item" key={q}>
+            <summary>
+              {q}
+              <Plus size={18} />
             </summary>
-            <p className="pt-3 text-muted">{a}</p>
+            <p>{a}</p>
           </details>
         ))}
-        <p className="pt-6 text-sm text-muted">
-          Cần thêm hỗ trợ? Nhắn <a href={site.telegram.url} className="link">Telegram {site.telegram.label}</a> · {site.hours}.
-        </p>
       </section>
+      <div className="catalog-support">
+        <div>
+          <span className="support-mark">?</span>
+          <div>
+            <strong>Trao đổi trực tiếp với cửa hàng</strong>
+            <p>{site.hours}</p>
+          </div>
+        </div>
+        <a href={site.telegram.url} target="_blank" rel="noreferrer">
+          {site.telegram.label}
+          <ArrowUpRight size={16} />
+        </a>
+      </div>
     </div>
   );
 }

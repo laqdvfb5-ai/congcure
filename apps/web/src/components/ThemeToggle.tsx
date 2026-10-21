@@ -1,18 +1,26 @@
-'use client';
+"use client";
 
-// Runs before paint (inlined in <head>) so the page never flashes the wrong theme.
-export const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}})()`;
+import { Moon, Sun } from "lucide-react";
 
+export const THEME_SCRIPT =
+  "(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}})()";
 export function ThemeToggle() {
   function toggle() {
-    const dark = document.documentElement.classList.toggle('dark');
-    localStorage.setItem('theme', dark ? 'dark' : 'light');
+    const dark = document.documentElement.classList.toggle("dark");
+    try {
+      localStorage.setItem("theme", dark ? "dark" : "light");
+    } catch {}
   }
   return (
-    <button type="button" onClick={toggle} aria-label="Chuyển sáng/tối"
-      className="flex h-9 w-9 items-center justify-center rounded-full border border-line font-mono text-sm transition-colors hover:border-fg">
-      <span className="dark:hidden">☾</span>
-      <span className="hidden dark:inline">☀</span>
+    <button
+      type="button"
+      onClick={toggle}
+      className="icon-btn"
+      title="Đổi giao diện sáng / tối"
+      aria-label="Đổi giao diện sáng / tối"
+    >
+      <Moon size={18} className="dark:hidden" />
+      <Sun size={18} className="hidden dark:block" />
     </button>
   );
 }

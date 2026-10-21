@@ -3,6 +3,8 @@ import { encryptSecret } from './crypto';
 import { AppError, isUniqueViolation } from './errors';
 import type { PriceFields } from './pricing';
 import { slugify } from './slug';
+import { isProductImageUrl, MAX_PRODUCT_IMAGES } from './media-rules';
+import { withSupplierStock } from './stock';
 
 export type ProductType = 'STOCK' | 'UNIQUE' | 'API';
 const PRODUCT_TYPES: ProductType[] = ['STOCK', 'UNIQUE', 'API'];
@@ -87,11 +89,15 @@ function normalizeProductInput(input: ProductInput) {
     if (!Number.isSafeInteger(v) || v < 0) throw new AppError('INVALID_INPUT', 'Giá không hợp lệ');
   }
   const supplierSku = input.supplierSku?.trim() || null;
+  const images = input.images ?? [];
+  if (images.length > MAX_PRODUCT_IMAGES || images.some(src => typeof src !== 'string' || !isProductImageUrl(src))) {
+    throw new AppError('INVALID_INPUT', `Tối đa ${MAX_PRODUCT_IMAGES} ảnh, dùng ảnh đã tải lên hoặc URL http/https hợp lệ`);
+  }
   if (input.type === 'API' && (!input.supplierId || !supplierSku)) {
     throw new AppError('INVALID_INPUT', 'Sản phẩm API cần nhà cung cấp và mã SKU');
   }
   return [
-    input.categoryId, name, slug, input.description?.trim() ?? '', input.images ?? [],
+    input.categoryId, name, slug, input.description?.trim() ?? '', images,
     JSON.stringify(input.attributes ?? {}), input.type, input.priceMember, input.priceCtv, input.priceAgent,
     input.active ?? true, input.type === 'API' ? input.supplierId : null, input.type === 'API' ? supplierSku : null,
   ];
@@ -133,19 +139,20 @@ export async function getProduct(id: number): Promise<Product | null> {
   return r.rows[0] ?? null;
 }
 
-export async function getProductBySlug(slug: string): Promise<Product | null> {
+export async function getProductBySlug(slug: string, opts: { includeSupplierStock?: boolean } = {}): Promise<Product | null> {
   const r = await getPool().query<Product>(`SELECT ${PRODUCT_COLS} FROM products p WHERE p.slug = $1`, [slug]);
+  if (opts.includeSupplierStock && r.rows.length) return (await withSupplierStock(r.rows))[0]!;
   return r.rows[0] ?? null;
 }
 
-export async function listProducts(opts: { categoryId?: number; activeOnly?: boolean } = {}): Promise<Product[]> {
+export async function listProducts(opts: { categoryId?: number; activeOnly?: boolean; includeSupplierStock?: boolean } = {}): Promise<Product[]> {
   const r = await getPool().query<Product>(
     `SELECT ${PRODUCT_COLS} FROM products p
      WHERE ($1::bigint IS NULL OR p.category_id = $1) AND (NOT $2 OR p.active)
      ORDER BY p.id DESC`,
     [opts.categoryId ?? null, opts.activeOnly ?? true],
   );
-  return r.rows;
+  return opts.includeSupplierStock ? withSupplierStock(r.rows) : r.rows;
 }
 
 export async function addStock(productId: number, lines: string[]): Promise<number> {

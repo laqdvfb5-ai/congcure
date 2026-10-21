@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./media": "./src/media.ts",
+    "./media-rules": "./src/media-rules.ts"
   },
   "scripts": {
     "test": "vitest run",
@@ -13,12 +15,14 @@
   },
   "dependencies": {
     "@web12/db": "*",
-    "pg-boss": "^12.38.0"
+    "cheerio": "^1.2.0",
+    "pg-boss": "^12.38.0",
+    "sharp": "^0.35.5"
   },
   "devDependencies": {
-    "vitest": "^5.0.5",
-    "pg": "^8.23.1",
     "@types/pg": "^8.23.1",
-    "@web12/mock-supplier": "*"
+    "@web12/mock-supplier": "*",
+    "pg": "^8.23.1",
+    "vitest": "^5.0.5"
   }
 }

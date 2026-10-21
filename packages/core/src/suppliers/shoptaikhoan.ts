@@ -1,4 +1,5 @@
 import { SupplierError, type SupplierAdapter, type SupplierProduct } from './types';
+import { createShoptaikhoanStockReader } from './shoptaikhoan-stock';
 
 // Seller API of shoptaikhoan.store. Docs: https://shoptaikhoan.store/shop/api-docs
 export const SHOPTAIKHOAN_BASE_URL = 'https://api.shoptaikhoan.store/api/seller/v1';
@@ -30,9 +31,10 @@ function toSecret(a: unknown): string {
 }
 
 export function createShoptaikhoanAdapter(cfg: {
-  baseUrl: string; apiKey: string; timeoutMs?: number; pageSize?: number;
+  baseUrl: string; apiKey: string; timeoutMs?: number; pageSize?: number; storefrontUrl?: string;
 }): SupplierAdapter {
   const base = cfg.baseUrl.replace(/\/+$/, '');
+  const storefrontUrl = cfg.storefrontUrl ?? (base === SHOPTAIKHOAN_BASE_URL ? 'https://shoptaikhoan.store' : undefined);
 
   /** Returns the full JSON body; throws SupplierError on transport or API errors. */
   async function call<T>(path: string, init: RequestInit & { headers?: Record<string, string> } = {}): Promise<T> {
@@ -40,8 +42,11 @@ export function createShoptaikhoanAdapter(cfg: {
     try {
       res = await fetch(`${base}${path}`, {
         ...init,
+        cache: 'no-store',
         headers: { 'content-type': 'application/json', 'x-api-key': cfg.apiKey, ...init.headers },
-        signal: AbortSignal.timeout(cfg.timeoutMs ?? 30_000),
+        signal: init.signal
+          ? AbortSignal.any([init.signal, AbortSignal.timeout(cfg.timeoutMs ?? 30_000)])
+          : AbortSignal.timeout(cfg.timeoutMs ?? 30_000),
       });
     } catch (err) {
       throw new SupplierError(`Không kết nối được nguồn: ${(err as Error).message}`, true);
@@ -50,12 +55,13 @@ export function createShoptaikhoanAdapter(cfg: {
     if (!res.ok || body.success === false) {
       const code = body.error?.code ?? '';
       const transient = TRANSIENT_CODES.has(code) || res.status >= 500 || res.status === 429;
-      throw new SupplierError(FRIENDLY[code] ?? body.message ?? `HTTP ${res.status}`, transient);
+      throw new SupplierError(FRIENDLY[code] ?? body.message ?? `HTTP ${res.status}`, transient, code);
     }
     return body as T;
   }
 
   return {
+    ...(storefrontUrl ? { getStock: createShoptaikhoanStockReader({ storefrontUrl, timeoutMs: cfg.timeoutMs }) } : {}),
     async placeOrder({ ref, sku, quantity }) {
       const productId = Number(sku);
       if (!Number.isSafeInteger(productId) || productId <= 0) {
@@ -78,6 +84,20 @@ export function createShoptaikhoanAdapter(cfg: {
       throw new SupplierError('Phản hồi không hợp lệ từ nguồn', true);
     },
 
+    async getProduct(sku, opts = {}) {
+      const id = Number(sku);
+      if (!Number.isSafeInteger(id) || id <= 0) return null;
+      try {
+        const body = await call<{ data?: { id: number; name: string; price: number; stock: number | null } }>(`/products/${id}`, { signal: opts.signal });
+        const product = body.data;
+        if (!product || product.id !== id) throw new SupplierError('Phản hồi sản phẩm không hợp lệ', true);
+        return { sku: String(product.id), name: product.name, price: product.price, stock: product.stock ?? null };
+      } catch (error) {
+        if (error instanceof SupplierError && error.code === 'PRODUCT_NOT_AVAILABLE') return null;
+        throw error;
+      }
+    },
+
     async listProducts(opts = {}) {
       const limit = cfg.pageSize ?? 100;
       const out: SupplierProduct[] = [];
@@ -87,7 +107,8 @@ export function createShoptaikhoanAdapter(cfg: {
         const body = await call<{
           data?: { id: number; name: string; price: number; stock: number | null }[];
           meta?: { totalPages?: number };
-        }>(`/products?${params}`);
+        }>(`/products?${params}`, { signal: opts.signal });
+        if (!Array.isArray(body.data)) throw new SupplierError('Phản hồi danh mục không hợp lệ', true);
         for (const p of body.data ?? []) out.push({ sku: String(p.id), name: p.name, price: p.price, stock: p.stock ?? null });
         if (page >= (body.meta?.totalPages ?? 1)) break;
       }
