@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowUpRight,
-  Boxes,
   ChevronRight,
   Code2,
   CreditCard,
@@ -61,9 +60,13 @@ export function AppShell({
           className="wordmark"
           onClick={() => mobile.current?.close()}
         >
-          <span className="logo-mark">
-            <Boxes size={23} strokeWidth={1.7} />
-          </span>
+          <img
+            className="logo-mark"
+            src="/brand/congcure-mark.svg"
+            width={40}
+            height={40}
+            alt=""
+          />
           <span>
             congcure<span className="logo-dot">.</span>
             <small>DIGITAL MARKETPLACE</small>
@@ -197,6 +200,13 @@ export function AppShell({
             >
               <Menu size={20} />
             </button>
+            <Link
+              href="/"
+              className="mobile-brand"
+              aria-label="congcure - Trang chủ"
+            >
+              <img src="/brand/congcure-mark.svg" width={32} height={32} alt="" />
+            </Link>
             <span className="text-muted">Cửa hàng</span>
             <ChevronRight size={14} />
             <strong>{title}</strong>

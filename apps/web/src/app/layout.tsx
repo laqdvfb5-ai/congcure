@@ -20,6 +20,13 @@ export const metadata = {
   title: { default: "congcure | Kho tài khoản số", template: "%s | congcure" },
   description:
     "Kho tài khoản số. Thanh toán bằng ví, nhận tài khoản và quản lý đơn hàng tại congcure.",
+  icons: {
+    icon: [
+      { url: "/brand/congcure-mark.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "16x16 32x32 48x48", type: "image/x-icon" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
 };
 export default async function RootLayout({
   children,

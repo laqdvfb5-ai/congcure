@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Eye } from "lucide-react";
 import type { Product, Tier } from "@web12/core";
 import { ProductThumbnail } from "./ProductCover";
 import { BuyButton } from "./Purchase";
@@ -45,6 +46,10 @@ export function ProductRow({
         <small>/ tài khoản</small>
       </div>
       <div className="product-action">
+        <Link href={"/san-pham/" + product.slug} className="btn-secondary btn-sm">
+          <Eye size={16} />
+          Xem chi tiết
+        </Link>
         <BuyButton
           product={{
             id: product.id,
