@@ -11,6 +11,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@fontsource/source-sans-pro": "^5.3.0",
     "@web12/core": "*",
     "@web12/db": "*",
     "lucide-react": "^1.61.0",

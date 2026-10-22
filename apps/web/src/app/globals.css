@@ -838,6 +838,13 @@ input[type="checkbox"] {
   color: var(--fg);
   max-width: 125px;
 }
+.featured-product,
+.product-row,
+.product-table-head,
+.product-detail,
+.purchase-dialog {
+  font-family: "Source Sans Pro", var(--font-grotesk), sans-serif;
+}
 .product-row,
 .product-table-head {
   display: grid;

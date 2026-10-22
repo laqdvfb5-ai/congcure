@@ -4,6 +4,9 @@ import { THEME_SCRIPT } from "@/components/ThemeToggle";
 import { AppShell } from "@/components/AppShell";
 import { getCurrentUser } from "@/lib/session";
 import { core } from "@/lib/core";
+import "@fontsource/source-sans-pro/400.css";
+import "@fontsource/source-sans-pro/600.css";
+import "@fontsource/source-sans-pro/700.css";
 import "./globals.css";
 
 const sans = Inter_Tight({
