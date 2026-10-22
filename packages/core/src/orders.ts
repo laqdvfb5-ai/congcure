@@ -7,7 +7,7 @@ import { priceForTier, type PriceFields } from './pricing';
 import type { Tier } from './types';
 import { applyBalanceChange } from './wallet';
 
-export type OrderStatus = 'PENDING' | 'COMPLETED' | 'REFUNDED';
+export type OrderStatus = 'PENDING' | 'PREORDER' | 'COMPLETED' | 'REFUNDED';
 export type OrderSource = 'WEB' | 'API';
 
 export interface Order {
@@ -26,6 +26,7 @@ export interface Order {
   supplierRef: string | null;
   error: string | null;
   attempts: number;
+  supplierAttempted: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -33,7 +34,7 @@ export interface Order {
 const ORDER_SELECT = `SELECT o.id, o.user_id AS "userId", o.product_id AS "productId", p.name AS "productName",
   p.type AS "productType", o.quantity, o.unit_price AS "unitPrice", o.total, o.status, o.source,
   o.payment_method AS "paymentMethod",
-  o.idempotency_key AS "idempotencyKey", o.supplier_ref AS "supplierRef", o.error, o.attempts,
+  o.idempotency_key AS "idempotencyKey", o.supplier_ref AS "supplierRef", o.error, o.attempts, o.supplier_attempted AS "supplierAttempted",
   o.created_at AS "createdAt", o.updated_at AS "updatedAt"
   FROM orders o JOIN products p ON p.id = o.product_id`;
 
@@ -45,13 +46,13 @@ async function findByKey(c: Queryable, userId: number, key: string): Promise<Ord
 /** Internal transaction helper. BANK callers must confirm and lock the payment first. */
 export async function createPaidOrder(c: Queryable, input: {
   userId: number; productId: number; productType: ProductType; quantity: number;
-  unitPrice: number; source: OrderSource; key: string | null; paymentMethod: 'WALLET' | 'BANK';
+  unitPrice: number; source: OrderSource; key: string | null; paymentMethod: 'WALLET' | 'BANK'; preorder?: boolean;
 }): Promise<{ id: number; isApi: boolean }> {
   const total = input.unitPrice * input.quantity;
   if (!Number.isSafeInteger(total) || total < 0) throw new AppError('INVALID_INPUT', 'Số tiền không hợp lệ');
   const isApi = input.productType === 'API';
   let itemIds: number[] = [];
-  if (!isApi) {
+  if (!isApi && !input.preorder) {
     const items = await c.query<{ id: number }>(
       `SELECT id FROM stock_items WHERE product_id = $1 AND status = 'AVAILABLE'
        ORDER BY id LIMIT $2 FOR UPDATE SKIP LOCKED`, [input.productId, input.quantity],
@@ -63,7 +64,7 @@ export async function createPaidOrder(c: Queryable, input: {
     `INSERT INTO orders (user_id, product_id, quantity, unit_price, total, status, source, idempotency_key, payment_method)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`,
     [input.userId, input.productId, input.quantity, input.unitPrice, total,
-      isApi ? 'PENDING' : 'COMPLETED', input.source, input.key, input.paymentMethod],
+      input.preorder ? 'PREORDER' : isApi ? 'PENDING' : 'COMPLETED', input.source, input.key, input.paymentMethod],
   );
   const id = inserted.rows[0]!.id;
   if (total > 0 && input.paymentMethod === 'WALLET') {
@@ -80,7 +81,7 @@ export async function createPaidOrder(c: Queryable, input: {
 
 export async function purchase(
   userId: number, productId: number, quantity: number,
-  opts: { source?: OrderSource; idempotencyKey?: string | null } = {},
+  opts: { source?: OrderSource; idempotencyKey?: string | null; preorder?: boolean } = {},
 ): Promise<Order> {
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
     throw new AppError('INVALID_INPUT', 'Số lượng phải từ 1 đến 100');
@@ -102,6 +103,13 @@ export async function purchase(
          FROM products WHERE id = $1`, [productId],
       )).rows[0];
       if (!product || !product.active) throw new AppError('NOT_FOUND', 'Sản phẩm không tồn tại');
+      if (opts.preorder && product.type === 'API') {
+        const supplier = (await c.query<{ active: boolean; adapter: string }>(
+          'SELECT s.active, s.adapter FROM suppliers s JOIN products p ON p.supplier_id = s.id WHERE p.id = $1', [productId],
+        )).rows[0];
+        if (!supplier?.active) throw new AppError('OUT_OF_STOCK', 'Sản phẩm tạm ngừng bán');
+        if (supplier.adapter === 'shoptaikhoan' && quantity > 50) throw new AppError('INVALID_INPUT', 'Sản phẩm này mua tối đa 50 tài khoản mỗi đơn');
+      }
       if (product.type === 'UNIQUE' && quantity !== 1) {
         throw new AppError('INVALID_INPUT', 'Sản phẩm này chỉ mua được số lượng 1');
       }
@@ -109,7 +117,7 @@ export async function purchase(
       const unitPrice = priceForTier(product, user.tier);
       return createPaidOrder(c, {
         userId, productId, productType: product.type, quantity, unitPrice,
-        source: opts.source ?? 'WEB', key, paymentMethod: 'WALLET',
+        source: opts.source ?? 'WEB', key, paymentMethod: 'WALLET', preorder: opts.preorder,
       });
     });
   } catch (e) {
@@ -129,7 +137,7 @@ export async function completeApiOrder(orderId: number, secrets: string[], suppl
   return withTx(async (c) => {
     const r = await c.query<{ productId: number }>(
       `UPDATE orders SET status = 'COMPLETED', supplier_ref = $2, error = NULL, updated_at = now()
-       WHERE id = $1 AND status = 'PENDING' RETURNING product_id AS "productId"`,
+       WHERE id = $1 AND status IN ('PENDING', 'PREORDER') RETURNING product_id AS "productId"`,
       [orderId, supplierRef],
     );
     const row = r.rows[0];

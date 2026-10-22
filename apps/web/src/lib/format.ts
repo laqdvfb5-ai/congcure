@@ -21,6 +21,7 @@ export const TYPE_LABEL: Record<ProductType, string> = {
 };
 export const STATUS_LABEL: Record<OrderStatus, string> = {
   PENDING: "Đang xử lý",
+  PREORDER: "Đặt trước · Chờ hàng",
   COMPLETED: "Hoàn thành",
   REFUNDED: "Đã hoàn tiền",
 };

@@ -925,7 +925,8 @@ input[type="checkbox"] {
   background: currentColor;
   flex: none;
 }
-.status-badge.pending {
+.status-badge.pending,
+.status-badge.preorder {
   color: var(--warning);
   background: var(--warning-soft);
 }

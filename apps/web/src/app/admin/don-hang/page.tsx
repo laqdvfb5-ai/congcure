@@ -1,10 +1,13 @@
 import Link from "next/link";
+import { fulfillPreorderAction } from "../actions";
+import { SubmitButton } from "@/components/SubmitButton";
+import { Flash } from "@/components/Flash";
 import type { OrderStatus } from "@web12/core";
 import { PageHeading, OrderBadge, EmptyState } from "@/components/ui";
 import { core } from "@/lib/core";
 import { formatDate, formatVnd, STATUS_LABEL } from "@/lib/format";
 
-const statuses: OrderStatus[] = ["PENDING", "COMPLETED", "REFUNDED"];
+const statuses: OrderStatus[] = ["PREORDER", "PENDING", "COMPLETED", "REFUNDED"];
 export default async function AdminOrders({
   searchParams,
 }: {
@@ -17,6 +20,7 @@ export default async function AdminOrders({
   const orders = await core.listAllOrders({ status });
   return (
     <>
+      <Flash searchParams={sp} />
       <PageHeading
         eyebrow="QUẢN TRỊ / BÁN HÀNG"
         title="Đơn hàng"
@@ -50,6 +54,7 @@ export default async function AdminOrders({
                 <th>Trạng thái</th>
                 <th>Lần thử</th>
                 <th>Thời gian</th>
+                <th>Giao đơn đặt trước</th>
               </tr>
             </thead>
             <tbody>
@@ -75,6 +80,18 @@ export default async function AdminOrders({
                   <td>{o.attempts}</td>
                   <td className="nowrap text-xs text-muted">
                     {formatDate(o.createdAt)}
+                  </td>
+                  <td>
+                    {o.status === "PREORDER" && (
+                      o.supplierAttempted ? <p className="text-xs">Đang xác định kết quả mua từ nguồn. Tạm khóa giao tay.</p> :
+                      <form action={fulfillPreorderAction} className="min-w-64">
+                        <input type="hidden" name="orderId" value={o.id} />
+                        <label htmlFor={`accounts-${o.id}`}>Nhập {o.quantity} tài khoản, mỗi dòng một tài khoản</label>
+                        <textarea id={`accounts-${o.id}`} name="accounts" rows={3} className="input" />
+                        <p className="text-xs text-muted">Để trống để lấy hàng từ kho đã nhập.</p>
+                        <SubmitButton className="btn btn-sm">Giao hàng</SubmitButton>
+                      </form>
+                    )}
                   </td>
                 </tr>
               ))}

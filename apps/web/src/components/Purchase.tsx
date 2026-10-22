@@ -37,12 +37,14 @@ export function PurchaseForm({
   const [method, setMethod] = useState<"WALLET" | "BANK">("WALLET");
   const max = Math.max(
     1,
-    Math.min(product.maxQuantity, product.stock ?? product.maxQuantity),
+    Math.min(product.maxQuantity, product.stock === 0 ? product.maxQuantity : product.stock ?? product.maxQuantity),
   );
   const total = product.price * quantity;
   const insufficient = total > balance;
   return (
     <form action={buyAction} className="purchase-form">
+      <input type="hidden" name="preorder" value={String(product.stock === 0)} />
+      {product.stock === 0 && <p className="notice notice-warning">Đặt trước: thanh toán ngay, nhận tài khoản khi có hàng. Đơn được lưu ở trạng thái chờ hàng.</p>}
       <input type="hidden" name="productId" value={product.id} />
       <input type="hidden" name="slug" value={product.slug} />
       <input type="hidden" name="requestId" value={requestId} />
@@ -147,9 +149,9 @@ export function PurchaseForm({
           <ArrowRight size={16} />
         </Link>
       ) : (
-        <SubmitButton className="btn w-full" disabled={product.stock === 0}>
+        <SubmitButton className="btn w-full">
           {method === "BANK" ? <QrCode size={17} /> : <ShoppingBag size={17} />}
-          {method === "BANK" ? "Thanh toán ngay " : "Thanh toán "}
+          {product.stock === 0 ? "Đặt trước " : method === "BANK" ? "Thanh toán ngay " : "Thanh toán "}
           {formatVnd(total)}
         </SubmitButton>
       )}
@@ -165,16 +167,10 @@ export function BuyButton({
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [requestId, setRequestId] = useState("");
-  if (product.stock === 0)
-    return (
-      <button className="btn-secondary btn-sm" disabled>
-        Hết hàng
-      </button>
-    );
   if (balance === null)
     return (
       <Link href="/dang-nhap" className="btn btn-sm">
-        Mua ngay
+        {product.stock === 0 ? "Đặt trước" : "Mua ngay"}
         <ArrowRight size={15} />
       </Link>
     );
@@ -188,7 +184,7 @@ export function BuyButton({
           dialog.current?.showModal();
         }}
       >
-        Mua ngay
+        {product.stock === 0 ? "Đặt trước" : "Mua ngay"}
         <ArrowRight size={15} />
       </button>
       <dialog

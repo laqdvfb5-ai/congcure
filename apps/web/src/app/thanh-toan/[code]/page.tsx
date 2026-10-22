@@ -36,6 +36,7 @@ export default async function BankPaymentPage({
         description={payment.productName}
       />
       <Flash searchParams={await searchParams} />
+      {payment.preorder && <p className="notice notice-warning">Đây là đơn đặt trước. Sau khi nhận đủ tiền, đơn sẽ chờ hàng và tài khoản được giao tại trang đơn hàng.</p>}
       <dl className="checkout-order-summary">
         <div>
           <dt>Số lượng</dt>

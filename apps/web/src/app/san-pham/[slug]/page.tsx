@@ -97,11 +97,7 @@ export default async function ProductPage({
           <div className="price-large">
             {formatVnd(price)} <small>/ tài khoản</small>
           </div>
-          {product.stock === 0 ? (
-            <div className="notice">
-              Sản phẩm đang hết hàng. Vui lòng quay lại sau.
-            </div>
-          ) : user ? (
+          {user ? (
             <PurchaseForm
               product={{
                 id: product.id,
@@ -118,7 +114,7 @@ export default async function ProductPage({
           ) : (
             <Link href="/dang-nhap" className="btn w-full">
               <ShoppingBag size={17} />
-              Đăng nhập để mua
+              {product.stock === 0 ? "Đăng nhập để đặt trước" : "Đăng nhập để mua"}
             </Link>
           )}
           <div className="dialog-note">

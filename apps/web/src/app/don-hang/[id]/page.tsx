@@ -61,7 +61,7 @@ export default async function OrderDetailPage({
           ? "Chuyển khoản ngân hàng"
           : "Ví tài khoản"}
       </p>
-      {order.status === "PENDING" && <OrderRefresh orderId={order.id} />}
+      {(order.status === "PENDING" || order.status === "PREORDER") && <OrderRefresh orderId={order.id} preorder={order.status === "PREORDER"} />}
       {order.status === "REFUNDED" && (
         <div className="notice notice-error">
           <RotateCcw size={18} />

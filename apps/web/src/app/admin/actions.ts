@@ -30,6 +30,17 @@ export async function createCategoryAction(f: FormData) {
   ok('/admin/danh-muc', 'Đã tạo danh mục');
 }
 
+export async function fulfillPreorderAction(f: FormData) {
+  try {
+    const actor = await requireStaff();
+    await core.fulfillPreorderManually(int(f, 'orderId'), actor.id, lines(str(f, 'accounts')));
+    revalidatePath('/don-hang');
+    revalidatePath(`/don-hang/${int(f, 'orderId')}`);
+    revalidatePath('/');
+  } catch (e) { fail('/admin/don-hang?status=PREORDER', e); }
+  ok('/admin/don-hang?status=PREORDER', 'Đã giao tài khoản cho khách');
+}
+
 export async function saveProductAction(f: FormData) {
   const id = int(f, 'id');
   const back = id ? `/admin/san-pham/${id}` : '/admin/san-pham/moi';

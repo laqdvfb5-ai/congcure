@@ -9,6 +9,7 @@ import { applyBalanceChange } from './wallet';
 
 export type BankPaymentStatus = 'PENDING' | 'PAID' | 'CREDITED' | 'EXPIRED' | 'CANCELLED';
 export interface BankPayment {
+  preorder: boolean;
   id: number; code: string; userId: number; productId: number; productName: string; productSlug: string;
   quantity: number; unitPrice: number; total: number; receivedAmount: number; creditedAmount: number;
   status: BankPaymentStatus; orderId: number | null; bankId: string; bankAccount: string;
@@ -17,7 +18,7 @@ export interface BankPayment {
 interface LockedPayment extends BankPayment {
   productType: ProductType; supplierId: number | null; supplierSku: string | null;
 }
-const SELECT = `SELECT b.id, b.code, b.user_id AS "userId", b.product_id AS "productId",
+const SELECT = `SELECT b.id, b.preorder, b.code, b.user_id AS "userId", b.product_id AS "productId",
   b.product_name AS "productName", p.slug AS "productSlug", b.product_type AS "productType",
   b.supplier_id AS "supplierId", b.supplier_sku AS "supplierSku", b.quantity, b.unit_price AS "unitPrice",
   b.total, b.received_amount AS "receivedAmount", b.credited_amount AS "creditedAmount", b.status,
@@ -31,7 +32,7 @@ export function parseBankPaymentCode(content: string): string | null {
 }
 
 export async function createBankPayment(userId: number, productId: number, quantity: number, input: {
-  requestKey: string; bankId: string; bankAccount: string; bankAccountName: string;
+  preorder?: boolean; requestKey: string; bankId: string; bankAccount: string; bankAccountName: string;
 }): Promise<BankPayment> {
   if (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > 100) {
     throw new AppError('INVALID_INPUT', 'Số lượng phải từ 1 đến 100');
@@ -46,7 +47,7 @@ export async function createBankPayment(userId: number, productId: number, quant
     if (!user) throw new AppError('NOT_FOUND', 'Không tìm thấy người dùng');
     const previous = (await c.query<BankPayment>(`${SELECT} WHERE b.user_id = $1 AND b.request_key = $2`, [userId, input.requestKey])).rows[0];
     if (previous) {
-      if (previous.productId !== productId || previous.quantity !== quantity) throw new AppError('CONFLICT', 'Yêu cầu thanh toán đã thay đổi. Vui lòng tải lại trang.');
+      if (previous.productId !== productId || previous.quantity !== quantity || previous.preorder !== Boolean(input.preorder)) throw new AppError('CONFLICT', 'Yêu cầu thanh toán đã thay đổi. Vui lòng tải lại trang.');
       return previous.code;
     }
     const pending = await c.query<{ count: number }>(
@@ -63,7 +64,7 @@ export async function createBankPayment(userId: number, productId: number, quant
       const supplier = (await c.query<{ active: boolean; adapter: string }>('SELECT active, adapter FROM suppliers WHERE id = $1', [product.supplierId])).rows[0];
       if (!supplier?.active) throw new AppError('OUT_OF_STOCK', 'Sản phẩm tạm ngừng bán');
       if (supplier.adapter === 'shoptaikhoan' && quantity > 50) throw new AppError('INVALID_INPUT', 'Sản phẩm này mua tối đa 50 tài khoản mỗi đơn');
-    } else {
+    } else if (!input.preorder) {
       const stock = await c.query<{ count: number }>(`SELECT count(*)::int AS count FROM stock_items WHERE product_id = $1 AND status = 'AVAILABLE'`, [productId]);
       if (stock.rows[0]!.count < quantity) throw new AppError('OUT_OF_STOCK', 'Không đủ hàng');
     }
@@ -73,9 +74,9 @@ export async function createBankPayment(userId: number, productId: number, quant
     }
     const code = 'DH' + randomBytes(8).toString('hex').toUpperCase();
     await c.query(`INSERT INTO bank_payments
-      (code,user_id,product_id,product_name,product_type,supplier_id,supplier_sku,quantity,unit_price,total,request_key,bank_id,bank_account,bank_account_name)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
-    [code,userId,productId,product.name,product.type,product.supplierId,product.supplierSku,quantity,price,price*quantity,input.requestKey,input.bankId,input.bankAccount,input.bankAccountName]);
+      (code,user_id,product_id,product_name,product_type,supplier_id,supplier_sku,quantity,unit_price,total,request_key,bank_id,bank_account,bank_account_name,preorder)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
+    [code,userId,productId,product.name,product.type,product.supplierId,product.supplierSku,quantity,price,price*quantity,input.requestKey,input.bankId,input.bankAccount,input.bankAccountName,Boolean(input.preorder)]);
     return code;
   });
   return getBankPaymentForUser(code, userId);
@@ -159,7 +160,7 @@ export async function receiveBankPayment(c: Queryable, code: string, account: st
     order = await createPaidOrder(c, {
       userId: payment.userId, productId: payment.productId, productType: payment.productType,
       quantity: payment.quantity, unitPrice: payment.unitPrice, source: 'WEB',
-      key: null, paymentMethod: 'BANK',
+      key: null, paymentMethod: 'BANK', preorder: payment.preorder,
     });
   } catch (error) {
     await c.query('ROLLBACK TO SAVEPOINT allocate_order');

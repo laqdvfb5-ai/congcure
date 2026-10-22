@@ -1,13 +1,15 @@
 import { getProduct } from './catalog';
+import { fulfillPreorder } from './preorders';
 import { completeApiOrder, getOrder, incrementAttempts, refundOrder } from './orders';
 import { getAdapterForSupplier, SupplierError } from './suppliers/index';
 
 export const MAX_FULFILL_ATTEMPTS = 5;
 
-export type FulfillOutcome = 'completed' | 'refunded' | 'skipped';
+export type FulfillOutcome = 'completed' | 'refunded' | 'skipped' | 'waiting';
 
 export async function fulfillApiOrder(orderId: number): Promise<FulfillOutcome> {
   const order = await getOrder(orderId);
+  if (order?.status === 'PREORDER') return fulfillPreorder(orderId);
   if (!order || order.status !== 'PENDING') return 'skipped';
 
   const attempts = await incrementAttempts(orderId);

@@ -1,7 +1,7 @@
 import http from "node:http";
 import type { AddressInfo } from "node:net";
 import { test, expect } from "@playwright/test";
-import { closePool } from "@web12/db";
+import { closePool, getPool } from "@web12/db";
 import {
   adjustBalance,
   createApiKey,
@@ -20,6 +20,7 @@ let soldOut: { id: number; slug: string; name: string };
 let unknown: { id: number; slug: string; name: string };
 let token: string;
 let apiKey: string;
+let adminToken: string;
 let calls = 0;
 
 test.beforeAll(async () => {
@@ -97,6 +98,35 @@ test.beforeAll(async () => {
   await adjustBalance(user.id, 100_000, "UI stock test", user.id);
   token = (await login(user.email, "stock-test-password")).token;
   apiKey = (await createApiKey(user.id, "stock API test")).key;
+  const admin = await registerUser({ email: `stock-admin-${stamp}@test.local`, password: "stock-test-password", name: "Preorder Admin" });
+  await getPool().query("UPDATE users SET role = 'ADMIN' WHERE id = $1", [admin.id]);
+  adminToken = (await login(admin.email, "stock-test-password")).token;
+});
+
+test("customer preorders sold-out stock and admin delivers accounts", async ({ page }) => {
+  await page.context().addCookies([{ name: "sid", value: token, url: "http://localhost:3002" }]);
+  await page.goto("/danh-muc/" + categorySlug);
+  await page.locator(".product-row").filter({ hasText: soldOut.name }).getByRole("button", { name: "Đặt trước" }).click();
+  await expect(page.getByRole("dialog")).toContainText("thanh toán ngay, nhận tài khoản khi có hàng");
+  await page.getByRole("dialog").getByRole("button", { name: /Đặt trước/ }).click();
+  await expect(page).toHaveURL(/\/don-hang\/\d+$/);
+  const orderUrl = page.url();
+  const orderId = orderUrl.split("/").pop()!;
+  await expect(page.getByText("Đơn đặt trước đang chờ hàng")).toBeVisible();
+
+  await page.context().addCookies([{ name: "sid", value: adminToken, url: "http://localhost:3002" }]);
+  await page.goto("/admin/don-hang?status=PREORDER");
+  const row = page.locator("tr").filter({ has: page.locator(`input[name="orderId"][value="${orderId}"]`) });
+  await row.getByRole("textbox").fill("preorder@example.test|secret");
+  await row.getByRole("button", { name: "Giao hàng", exact: true }).click();
+  await expect(page.getByText("Đã giao tài khoản cho khách")).toBeVisible();
+
+  await page.context().addCookies([{ name: "sid", value: token, url: "http://localhost:3002" }]);
+  await page.goto(orderUrl);
+  await expect(page.locator(".status-badge")).toHaveText("Hoàn thành");
+  await expect(page.locator("main")).toContainText("preorder@example.test|secret");
+  await page.goto("/san-pham/" + soldOut.slug);
+  await expect(page.getByRole("button", { name: /Đặt trước/ })).toBeEnabled();
 });
 
 test.afterAll(async () => {
@@ -126,8 +156,8 @@ test("shows live counts across catalog, detail, quick buy and reseller API witho
   await expect(availableRow.locator(".product-stock")).toHaveText("7");
   await expect(emptyRow.locator(".product-stock")).toHaveText("0");
   await expect(
-    emptyRow.getByRole("button", { name: "Hết hàng" }),
-  ).toBeDisabled();
+    emptyRow.getByRole("button", { name: "Đặt trước" }),
+  ).toBeEnabled();
   await expect(unknownRow.locator(".product-stock")).toHaveText(
     "Chưa cập nhật",
   );

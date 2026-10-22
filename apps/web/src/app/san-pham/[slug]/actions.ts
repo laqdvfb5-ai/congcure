@@ -22,6 +22,7 @@ export async function buyAction(form: FormData) {
         Number(form.get("productId")),
         Number(form.get("quantity") ?? 1),
         {
+          preorder: form.get("preorder") === "true",
           requestKey: String(form.get("requestId") ?? ""),
           bankId: process.env.BANK_ID ?? "",
           bankAccount: process.env.BANK_ACCOUNT ?? "",
@@ -36,6 +37,7 @@ export async function buyAction(form: FormData) {
         Number(form.get("quantity") ?? 1),
         {
           source: "WEB",
+          preorder: form.get("preorder") === "true",
           idempotencyKey: String(form.get("requestId") ?? "") || null,
         },
       );

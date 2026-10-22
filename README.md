@@ -62,6 +62,16 @@ Webhook SePay phải nhận cả mã `NAP` (nạp ví) và `DH` (thanh toán đ�
 
 Triển khai cần chạy migration `002_bank_payments.sql` trước khi khởi động bản web và worker mới. Không dùng webhook giả trên production để thử thanh toán: nó có thể tạo đơn và gọi mua hàng thật. Kiểm tra tự động dùng database test và sản phẩm kho giả.
 
+## Đặt trước khi hết hàng
+
+Sản phẩm có tồn kho bằng 0 hiển thị nút **Đặt trước** ở danh sách và trang chi tiết. Khách thanh toán bằng ví hoặc QR như bình thường; đơn đã thanh toán có trạng thái `PREORDER` (Đặt trước · Chờ hàng). QR chưa nhận đủ tiền chưa tạo đơn. Tồn kho chưa xác định (`null`) không tự coi là hết hàng.
+
+Worker kiểm tra đơn đặt trước nguồn API mỗi phút, chỉ gọi mua khi xác nhận đủ hàng; kết quả tồn kho được cache tối đa 30 giây. Đơn thiếu hàng hoặc lỗi nguồn tiếp tục chờ, không tự hoàn tiền sau 5 lần thử. Mỗi lần thử lại dùng cùng mã chống mua trùng. Cần giữ worker hoạt động; không cần cron hệ điều hành riêng.
+
+Trong `/admin/don-hang`, chọn **Đặt trước · Chờ hàng**. Admin/staff có thể nhập đúng số tài khoản (mỗi dòng một tài khoản) để giao trực tiếp cho đơn API hoặc kho riêng; để trống sẽ lấy từ kho đã nhập. Đơn kho riêng chỉ giao khi admin thao tác. Giao hàng không trừ tiền lần nữa. Hệ thống ghi người giao, mã hóa tài khoản và khóa xử lý để tránh worker/admin giao trùng. Nếu nguồn đã nhận yêu cầu nhưng chưa xác định kết quả, giao tay bị khóa để tránh mua/giao hai lần; worker tiếp tục kiểm tra cùng mã đơn.
+
+Trước khi chạy bản mới: `npm run db:migrate` để áp dụng `003_preorders.sql`, sau đó khởi động lại web và worker.
+
 ## API đại lý
 
 Header `X-API-Key: sk_...`, tạo khóa ở `/tai-khoan`. Giới hạn 60 request/phút.

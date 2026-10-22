@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LoaderCircle, RefreshCw } from "lucide-react";
 
-export function OrderRefresh({ orderId }: { orderId: number }) {
+export function OrderRefresh({ orderId, preorder = false }: { orderId: number; preorder?: boolean }) {
   const router = useRouter();
   const [error, setError] = useState(false);
   useEffect(() => {
@@ -21,7 +21,7 @@ export function OrderRefresh({ orderId }: { orderId: number }) {
         if (!res.ok) throw new Error("poll");
         const data = await res.json();
         setError(false);
-        if (data.status !== "PENDING") router.refresh();
+        if (data.status !== (preorder ? "PREORDER" : "PENDING")) router.refresh();
       } catch {
         if (!controller.signal.aborted) setError(true);
       } finally {
@@ -33,13 +33,13 @@ export function OrderRefresh({ orderId }: { orderId: number }) {
       clearInterval(timer);
       controller.abort();
     };
-  }, [orderId, router]);
+  }, [orderId, router, preorder]);
   return (
     <div className="notice notice-warning" role="status">
       <LoaderCircle size={18} className={error ? "" : "spin"} />
       <div>
         <strong>
-          {error ? "Chưa cập nhật được trạng thái" : "Đơn hàng đang được xử lý"}
+          {error ? "Chưa cập nhật được trạng thái" : preorder ? "Đơn đặt trước đang chờ hàng" : "Đơn hàng đang được xử lý"}
         </strong>
         <p className="mt-1">
           {error
