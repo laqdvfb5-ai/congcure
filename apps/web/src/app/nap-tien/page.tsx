@@ -13,10 +13,10 @@ export default async function TopupPage({
   const requested = Number((await searchParams).amount);
   const initialAmount =
     Number.isSafeInteger(requested) &&
-    requested >= 1000 &&
+    requested >= 10_000 &&
     requested <= 100_000_000
       ? requested
-      : 100_000;
+      : 10_000;
   const history = (await core.listLedger(user.id, 100))
     .filter((e) => e.type === "TOPUP")
     .slice(0, 20);

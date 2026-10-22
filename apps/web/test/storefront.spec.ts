@@ -164,7 +164,27 @@ test("wallet observes balance changes and API keys stay out of URLs", async ({
 }) => {
   await signIn(page);
   await page.goto("/nap-tien");
+  await expect(page.locator(".amount-grid button").first()).toHaveText("10.000đ");
+  await expect(
+    page.getByRole("button", { name: "10.000đ", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("img", { name: "QR nạp 10.000đ" })).toHaveAttribute(
+    "src", /amount=10000&/,
+  );
+  await page.goto("/nap-tien?amount=9000");
+  await expect(page.getByRole("img", { name: "QR nạp 10.000đ" })).toHaveAttribute(
+    "src", /amount=10000&/,
+  );
   await page.getByRole("button", { name: "Số khác", exact: true }).click();
+  const customAmount = page.getByRole("spinbutton", { name: "Số tiền tùy chọn" });
+  await customAmount.fill("9000");
+  await page.getByRole("button", { name: "Áp dụng", exact: true }).click();
+  expect(await customAmount.evaluate(
+    (input: HTMLInputElement) => input.validity.rangeUnderflow,
+  )).toBe(true);
+  await expect(page.getByRole("img", { name: "QR nạp 10.000đ" })).toHaveAttribute(
+    "src", /amount=10000&/,
+  );
   await page
     .getByRole("spinbutton", { name: "Số tiền tùy chọn" })
     .fill("123000");

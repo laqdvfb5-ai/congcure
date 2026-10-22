@@ -6,7 +6,7 @@ import { CircleCheck, CreditCard, LoaderCircle, Wallet } from "lucide-react";
 import { CopyButton } from "./CopyButton";
 import { formatVnd } from "@/lib/format";
 
-const presets = [50_000, 100_000, 200_000, 500_000, 1_000_000];
+const presets = [10_000, 50_000, 100_000, 200_000, 500_000, 1_000_000];
 export function TopupPanel({
   initialBalance,
   initialAmount,
@@ -114,7 +114,7 @@ export function TopupPanel({
             onSubmit={(e) => {
               e.preventDefault();
               const n = Number(draft);
-              if (Number.isSafeInteger(n) && n >= 1000 && n <= 100_000_000) {
+              if (Number.isSafeInteger(n) && n >= 10_000 && n <= 100_000_000) {
                 setAmount(n);
                 setQrFailed(false);
               }
@@ -123,7 +123,7 @@ export function TopupPanel({
             <input
               className="input"
               type="number"
-              min={1000}
+              min={10_000}
               max={100_000_000}
               step={1000}
               value={draft}
