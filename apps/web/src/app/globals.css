@@ -2546,6 +2546,141 @@ input[type="checkbox"] {
     grid-template-columns: 1fr;
   }
 }
+/* Larger product text on desktop; keep the existing tablet/mobile layout. */
+@media (min-width: 1001px) {
+  .featured-product h2 {
+    font-size: 20px;
+    line-height: 1.5;
+  }
+  .featured-bottom {
+    flex-wrap: wrap;
+  }
+  .featured-bottom strong {
+    font-size: 24px;
+  }
+  .featured-bottom > span,
+  .featured-product .eyebrow {
+    font-size: 13px;
+  }
+  .product-row,
+  .product-table-head {
+    grid-template-columns: minmax(0, 1fr) 128px 132px 256px;
+  }
+  .product-table-head {
+    font-size: 13px;
+  }
+  .product-name {
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  .product-identity p {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-top: 6px;
+  }
+  .product-price {
+    font-size: 20px;
+    overflow-wrap: anywhere;
+  }
+  .product-price small {
+    font-size: 14px;
+  }
+  .product-row .stock-badge,
+  .purchase-panel .stock-badge {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .product-row .stock-badge {
+    white-space: normal;
+  }
+  .product-action .btn,
+  .product-action .btn-secondary {
+    font-size: 15px;
+    min-height: 44px;
+    white-space: normal;
+  }
+  .product-info h1 {
+    font-size: 34px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+  .product-info .product-description {
+    font-size: 18px;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+  }
+  .product-specs > div {
+    font-size: 16px;
+    line-height: 1.65;
+    padding-block: 14px;
+  }
+  .price-large {
+    font-size: 38px;
+    overflow-wrap: anywhere;
+  }
+  .price-large small {
+    font-size: 16px;
+  }
+  .purchase-dialog {
+    width: 500px;
+  }
+  .purchase-dialog h2 {
+    font-size: 26px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+  .purchase-dialog > .text-sm,
+  .purchase-quantity,
+  .purchase-summary,
+  .purchase-form .notice,
+  .purchase-form .payment-methods legend {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  .purchase-summary > div {
+    flex-wrap: wrap;
+  }
+  .purchase-summary dd {
+    margin-left: auto;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .purchase-summary .purchase-total dd {
+    font-size: 28px;
+  }
+  .purchase-form .quantity-control {
+    height: 44px;
+  }
+  .purchase-form .quantity-control input {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .purchase-form .payment-choice,
+  .purchase-form .btn,
+  .purchase-panel > .btn {
+    font-size: 17px;
+  }
+  .purchase-form .payment-choice small,
+  .purchase-panel .dialog-note,
+  .purchase-dialog .dialog-note {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .purchase-panel .eyebrow,
+  .purchase-dialog .eyebrow,
+  .product-info .eyebrow {
+    font-size: 13px;
+  }
+}
+@media (min-width: 1001px) and (max-width: 1200px) {
+  .product-row,
+  .product-table-head {
+    grid-template-columns: minmax(0, 1fr) 112px 120px 132px;
+  }
+  .product-action {
+    grid-template-columns: 1fr;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
