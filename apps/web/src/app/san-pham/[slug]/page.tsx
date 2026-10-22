@@ -97,14 +97,6 @@ export default async function ProductPage({
           <div className="price-large">
             {formatVnd(price)} <small>/ tài khoản</small>
           </div>
-          <div className="tier-grid">
-            {core.TIERS.map((t) => (
-              <div key={t} className={t === tier ? "current" : ""}>
-                <small>{TIER_LABEL[t]}</small>
-                <b>{formatVnd(core.priceForTier(product, t))}</b>
-              </div>
-            ))}
-          </div>
           {product.stock === 0 ? (
             <div className="notice">
               Sản phẩm đang hết hàng. Vui lòng quay lại sau.

@@ -55,6 +55,12 @@ export default async function OrderDetailPage({
           <dd className="text-[var(--primary)]">{formatVnd(order.total)}</dd>
         </div>
       </dl>
+      <p className="text-sm text-muted mb-5">
+        Phương thức thanh toán:{" "}
+        {order.paymentMethod === "BANK"
+          ? "Chuyển khoản ngân hàng"
+          : "Ví tài khoản"}
+      </p>
       {order.status === "PENDING" && <OrderRefresh orderId={order.id} />}
       {order.status === "REFUNDED" && (
         <div className="notice notice-error">

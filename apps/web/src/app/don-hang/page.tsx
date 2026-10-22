@@ -12,6 +12,7 @@ export default async function OrdersPage({
 }) {
   const user = await requireUser();
   const all = await core.listOrdersForUser(user.id);
+  const payments = await core.listBankPaymentsForUser(user.id);
   const status = (await searchParams).status;
   const orders = ["PENDING", "COMPLETED", "REFUNDED"].includes(status ?? "")
     ? all.filter((o) => o.status === status)
@@ -28,6 +29,37 @@ export default async function OrdersPage({
           <ArrowRight size={16} />
         </Link>
       </PageHeading>
+      {payments.length > 0 && (
+        <section className="pending-payments">
+          <h2>Thanh toán ngân hàng</h2>
+          {payments.map((payment) => (
+            <Link
+              key={payment.code}
+              href={`/thanh-toan/${payment.code}`}
+              className="pending-payment"
+            >
+              <span>
+                <strong>{payment.productName}</strong>
+                <small>
+                  {payment.quantity} tài khoản · {formatVnd(payment.total)}
+                </small>
+              </span>
+              <span>
+                {payment.status === "PENDING"
+                  ? new Date(payment.expiresAt).getTime() > Date.now()
+                    ? "Chờ chuyển khoản"
+                    : "Đã hết hạn"
+                  : payment.status === "CANCELLED"
+                    ? "Đã hủy"
+                    : payment.status === "CREDITED"
+                      ? "Đã ghi nhận vào ví"
+                      : "Đã hết hạn"}
+              </span>
+              <ArrowRight size={17} />
+            </Link>
+          ))}
+        </section>
+      )}
       <div className="summary-grid">
         <div className="summary-item">
           <span>
@@ -95,7 +127,11 @@ export default async function OrdersPage({
                   <td className="min-w-44">
                     <Link href={"/don-hang/" + o.id}>{o.productName}</Link>
                     <div className="text-xs text-muted">
-                      {o.source === "API" ? "API đại lý" : "Mua trên web"}
+                      {o.paymentMethod === "BANK"
+                        ? "Chuyển khoản ngân hàng"
+                        : o.source === "API"
+                          ? "API đại lý"
+                          : "Thanh toán bằng ví"}
                     </div>
                   </td>
                   <td>{o.quantity}</td>

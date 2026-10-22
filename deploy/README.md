@@ -45,6 +45,14 @@ systemctl status congcure-web congcure-worker caddy
 journalctl -u congcure-web -u congcure-worker -n 100 --no-pager
 ```
 
+Direct bank checkout requires migration `002_bank_payments.sql`. Back up the
+database before migrating; this migration adds tables/columns and preserves
+existing wallet orders. Restart the worker with the web release so pending
+bank payments expire and partial transfers return to the wallet. SePay must
+forward both `NAP` and `DH` transfer memos; leave code filtering disabled unless
+both patterns have been configured. Never simulate successful bank receipts on
+production: paid API orders can immediately spend the supplier balance.
+
 Back up PostgreSQL, `/etc/congcure/app.env`, and `/var/lib/congcure/products`
 together. Losing `SECRET_KEY` makes stored supplier and account secrets unreadable.
 Keep an additional backup outside this VPS.

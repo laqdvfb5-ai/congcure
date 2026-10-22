@@ -1,6 +1,8 @@
 import { getPool, withTx } from '@web12/db';
 import { AppError } from './errors';
 import { applyBalanceChange } from './wallet';
+import { parseBankPaymentCode, receiveBankPayment } from './bank-payments';
+import { enqueueFulfill } from './fulfill-queue';
 
 /** SePay webhook body (fields we use). */
 export interface BankWebhookPayload {
@@ -11,6 +13,7 @@ export interface BankWebhookPayload {
   content: string;
   referenceCode?: string;
   transactionDate?: string;
+  accountNumber?: string;
 }
 
 export type BankTxnStatus = 'MATCHED' | 'UNMATCHED' | 'IGNORED';
@@ -40,9 +43,12 @@ export async function handleBankWebhook(
     throw new AppError('INVALID_INPUT', 'Số tiền không hợp lệ');
   }
 
-  return withTx(async (c) => {
+  const result = await withTx(async (c) => {
     const incoming = p.transferType === 'in' && p.transferAmount > 0;
-    const code = incoming ? parseTopupCode(p.content ?? '') : null;
+    const content = typeof p.content === 'string' ? p.content : '';
+    const paymentCode = incoming ? parseBankPaymentCode(content) : null;
+    const hasPaymentCode = /DH[A-F0-9]{16}/i.test(content);
+    const code = incoming && !hasPaymentCode ? parseTopupCode(content) : null;
     const user = code
       ? (await c.query<{ id: number }>('SELECT id FROM users WHERE topup_code = $1', [code])).rows[0]
       : undefined;
@@ -57,6 +63,11 @@ export async function handleBankWebhook(
     );
     if (ins.rowCount === 0) return { status: 'DUPLICATE' as const, userId: null };
 
+    if (paymentCode) {
+      const payment = await receiveBankPayment(c, paymentCode, p.accountNumber ?? '', p.transferAmount, ins.rows[0]!.id);
+      if (payment) return { status: 'MATCHED' as const, ...payment };
+    }
+
     if (status === 'MATCHED' && user) {
       await applyBalanceChange(c, user.id, p.transferAmount, 'TOPUP', {
         refType: 'bank_txn', refId: ins.rows[0]!.id, note: p.content,
@@ -64,6 +75,8 @@ export async function handleBankWebhook(
     }
     return { status, userId: user?.id ?? null };
   });
+  if ('orderId' in result && result.orderId) await enqueueFulfill(result.orderId);
+  return { status: result.status, userId: result.userId };
 }
 
 export async function assignBankTxn(txnId: number, userId: number, adminId: number): Promise<void> {

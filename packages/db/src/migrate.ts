@@ -7,7 +7,7 @@ const MIGRATIONS_DIR = fileURLToPath(new URL('../migrations', import.meta.url));
 
 export const ALL_TABLES = [
   'users', 'sessions', 'api_keys', 'categories', 'suppliers', 'products',
-  'orders', 'stock_items', 'ledger_entries', 'bank_transactions',
+  'orders', 'stock_items', 'ledger_entries', 'bank_transactions', 'bank_payments',
 ];
 
 export async function migrate(pool: pg.Pool): Promise<string[]> {

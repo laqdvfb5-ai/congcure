@@ -7,6 +7,7 @@ import {
   Check,
   Minus,
   Plus,
+  QrCode,
   ShoppingBag,
   Wallet,
   X,
@@ -33,6 +34,7 @@ export function PurchaseForm({
   requestId: string;
 }) {
   const [quantity, setQuantity] = useState(1);
+  const [method, setMethod] = useState<"WALLET" | "BANK">("WALLET");
   const max = Math.max(
     1,
     Math.min(product.maxQuantity, product.stock ?? product.maxQuantity),
@@ -44,6 +46,36 @@ export function PurchaseForm({
       <input type="hidden" name="productId" value={product.id} />
       <input type="hidden" name="slug" value={product.slug} />
       <input type="hidden" name="requestId" value={requestId} />
+      <fieldset className="payment-methods">
+        <legend>Phương thức thanh toán</legend>
+        <label className="payment-choice">
+          <input
+            type="radio"
+            name="paymentMethod"
+            value="WALLET"
+            checked={method === "WALLET"}
+            onChange={() => setMethod("WALLET")}
+          />
+          <Wallet size={19} />
+          <span>
+            Thanh toán bằng ví<small>{formatVnd(balance)}</small>
+          </span>
+        </label>
+        <label className="payment-choice">
+          <input
+            type="radio"
+            name="paymentMethod"
+            value="BANK"
+            checked={method === "BANK"}
+            onChange={() => setMethod("BANK")}
+            disabled={product.price === 0}
+          />
+          <QrCode size={19} />
+          <span>
+            Thanh toán ngay<small>QR ngân hàng</small>
+          </span>
+        </label>
+      </fieldset>
       <div className="purchase-quantity">
         <label htmlFor={"qty-" + requestId}>Số lượng</label>
         <div className="quantity-control">
@@ -84,36 +116,41 @@ export function PurchaseForm({
           <dt>Đơn giá</dt>
           <dd>{formatVnd(product.price)}</dd>
         </div>
-        <div>
-          <dt>Số dư ví</dt>
-          <dd>{formatVnd(balance)}</dd>
-        </div>
-        <div>
-          <dt>Số dư sau khi mua</dt>
-          <dd className={insufficient ? "text-accent" : ""}>
-            {formatVnd(balance - total)}
-          </dd>
-        </div>
+        {method === "WALLET" && (
+          <div>
+            <dt>Số dư ví</dt>
+            <dd>{formatVnd(balance)}</dd>
+          </div>
+        )}
+        {method === "WALLET" && (
+          <div>
+            <dt>Số dư sau khi mua</dt>
+            <dd className={insufficient ? "text-accent" : ""}>
+              {formatVnd(balance - total)}
+            </dd>
+          </div>
+        )}
         <div className="purchase-total">
           <dt>Tổng thanh toán</dt>
           <dd>{formatVnd(total)}</dd>
         </div>
       </dl>
-      {insufficient && (
+      {method === "WALLET" && insufficient && (
         <div className="notice notice-warning">
           <Wallet size={18} />
           <span>Cần nạp thêm {formatVnd(total - balance)} để thanh toán.</span>
         </div>
       )}
-      {insufficient ? (
+      {method === "WALLET" && insufficient ? (
         <Link href="/nap-tien" className="btn w-full">
           Nạp tiền vào ví
           <ArrowRight size={16} />
         </Link>
       ) : (
         <SubmitButton className="btn w-full" disabled={product.stock === 0}>
-          <ShoppingBag size={17} />
-          Thanh toán {formatVnd(total)}
+          {method === "BANK" ? <QrCode size={17} /> : <ShoppingBag size={17} />}
+          {method === "BANK" ? "Thanh toán ngay " : "Thanh toán "}
+          {formatVnd(total)}
         </SubmitButton>
       )}
     </form>
@@ -163,7 +200,7 @@ export function BuyButton({
         }}
       >
         <div className="dialog-head">
-          <span className="eyebrow">Thanh toán bằng ví</span>
+          <span className="eyebrow">Thanh toán</span>
           <button
             type="button"
             className="icon-btn"

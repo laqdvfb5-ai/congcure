@@ -60,7 +60,10 @@ export default async function AdminOrders({
                   <td className="min-w-44">{o.productName}</td>
                   <td>{o.quantity}</td>
                   <td className="nowrap">{formatVnd(o.total)}</td>
-                  <td className="text-xs">{o.source}</td>
+                  <td className="text-xs">
+                    {o.source}
+                    <div>{o.paymentMethod === "BANK" ? "Ngân hàng" : "Ví"}</div>
+                  </td>
                   <td>
                     <OrderBadge status={o.status} />
                     {o.error && (

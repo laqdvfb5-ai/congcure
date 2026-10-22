@@ -21,6 +21,7 @@ export interface Order {
   total: number;
   status: OrderStatus;
   source: OrderSource;
+  paymentMethod: 'WALLET' | 'BANK';
   idempotencyKey: string | null;
   supplierRef: string | null;
   error: string | null;
@@ -31,6 +32,7 @@ export interface Order {
 
 const ORDER_SELECT = `SELECT o.id, o.user_id AS "userId", o.product_id AS "productId", p.name AS "productName",
   p.type AS "productType", o.quantity, o.unit_price AS "unitPrice", o.total, o.status, o.source,
+  o.payment_method AS "paymentMethod",
   o.idempotency_key AS "idempotencyKey", o.supplier_ref AS "supplierRef", o.error, o.attempts,
   o.created_at AS "createdAt", o.updated_at AS "updatedAt"
   FROM orders o JOIN products p ON p.id = o.product_id`;
@@ -38,6 +40,42 @@ const ORDER_SELECT = `SELECT o.id, o.user_id AS "userId", o.product_id AS "produ
 async function findByKey(c: Queryable, userId: number, key: string): Promise<Order | null> {
   const r = await c.query<Order>(`${ORDER_SELECT} WHERE o.user_id = $1 AND o.idempotency_key = $2`, [userId, key]);
   return r.rows[0] ?? null;
+}
+
+/** Internal transaction helper. BANK callers must confirm and lock the payment first. */
+export async function createPaidOrder(c: Queryable, input: {
+  userId: number; productId: number; productType: ProductType; quantity: number;
+  unitPrice: number; source: OrderSource; key: string | null; paymentMethod: 'WALLET' | 'BANK';
+}): Promise<{ id: number; isApi: boolean }> {
+  const total = input.unitPrice * input.quantity;
+  if (!Number.isSafeInteger(total) || total < 0) throw new AppError('INVALID_INPUT', 'Số tiền không hợp lệ');
+  const isApi = input.productType === 'API';
+  let itemIds: number[] = [];
+  if (!isApi) {
+    const items = await c.query<{ id: number }>(
+      `SELECT id FROM stock_items WHERE product_id = $1 AND status = 'AVAILABLE'
+       ORDER BY id LIMIT $2 FOR UPDATE SKIP LOCKED`, [input.productId, input.quantity],
+    );
+    if (items.rows.length < input.quantity) throw new AppError('OUT_OF_STOCK', 'Không đủ hàng');
+    itemIds = items.rows.map(row => row.id);
+  }
+  const inserted = await c.query<{ id: number }>(
+    `INSERT INTO orders (user_id, product_id, quantity, unit_price, total, status, source, idempotency_key, payment_method)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`,
+    [input.userId, input.productId, input.quantity, input.unitPrice, total,
+      isApi ? 'PENDING' : 'COMPLETED', input.source, input.key, input.paymentMethod],
+  );
+  const id = inserted.rows[0]!.id;
+  if (total > 0 && input.paymentMethod === 'WALLET') {
+    await applyBalanceChange(c, input.userId, -total, 'PURCHASE', { refType: 'order', refId: id });
+  }
+  if (itemIds.length) {
+    await c.query(
+      `UPDATE stock_items SET status = 'SOLD', order_id = $1, sold_at = now() WHERE id = ANY($2::bigint[])`,
+      [id, itemIds],
+    );
+  }
+  return { id, isApi };
 }
 
 export async function purchase(
@@ -69,37 +107,10 @@ export async function purchase(
       }
 
       const unitPrice = priceForTier(product, user.tier);
-      const total = unitPrice * quantity;
-      const isApi = product.type === 'API';
-
-      let itemIds: number[] = [];
-      if (!isApi) {
-        const items = await c.query<{ id: number }>(
-          `SELECT id FROM stock_items WHERE product_id = $1 AND status = 'AVAILABLE'
-           ORDER BY id LIMIT $2 FOR UPDATE SKIP LOCKED`,
-          [productId, quantity],
-        );
-        if (items.rows.length < quantity) throw new AppError('OUT_OF_STOCK', 'Không đủ hàng');
-        itemIds = items.rows.map((r) => r.id);
-      }
-
-      const order = await c.query<{ id: number }>(
-        `INSERT INTO orders (user_id, product_id, quantity, unit_price, total, status, source, idempotency_key)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-        [userId, productId, quantity, unitPrice, total, isApi ? 'PENDING' : 'COMPLETED', opts.source ?? 'WEB', key],
-      );
-      const orderId = order.rows[0]!.id;
-
-      if (total > 0) {
-        await applyBalanceChange(c, userId, -total, 'PURCHASE', { refType: 'order', refId: orderId });
-      }
-      if (itemIds.length) {
-        await c.query(
-          `UPDATE stock_items SET status = 'SOLD', order_id = $1, sold_at = now() WHERE id = ANY($2::bigint[])`,
-          [orderId, itemIds],
-        );
-      }
-      return { id: orderId, isApi };
+      return createPaidOrder(c, {
+        userId, productId, productType: product.type, quantity, unitPrice,
+        source: opts.source ?? 'WEB', key, paymentMethod: 'WALLET',
+      });
     });
   } catch (e) {
     // A concurrent request with the same key won the insert race: return its order.

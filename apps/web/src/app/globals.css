@@ -1338,31 +1338,148 @@ input[type="checkbox"] {
   color: var(--muted);
   font-weight: 400;
 }
-.tier-grid {
+.payment-methods {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 7px;
+  gap: 8px;
+  border: 0;
   margin: 18px 0;
+  padding: 0;
 }
-.tier-grid > div {
+.payment-methods legend {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.payment-choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  min-height: 66px;
   border: 1px solid var(--line);
-  border-radius: 5px;
-  padding: 10px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
 }
-.tier-grid > div.current {
-  background: var(--primary-soft);
+.payment-choice:has(input:checked) {
   border-color: var(--primary);
+  background: var(--primary-soft);
 }
-.tier-grid small {
+.payment-choice input {
+  accent-color: var(--primary);
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.payment-choice > svg {
+  flex: none;
+  color: var(--primary);
+}
+.payment-choice small {
   display: block;
-  font-size: 10px;
   color: var(--muted);
+  font-size: 13px;
+  margin-top: 2px;
 }
-.tier-grid b {
-  display: block;
-  margin-top: 4px;
-  font-size: 12px;
+.payment-choice:has(input:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.checkout-order-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-block: 1px solid var(--line);
+  padding: 20px 0;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.checkout-order-summary dt {
+  color: var(--muted);
+  font-size: 14px;
+}
+.checkout-order-summary dd {
+  font-size: 18px;
   font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.bank-checkout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 40px;
+  max-width: 1000px;
+  margin-inline: auto;
+}
+.bank-checkout h2,
+.checkout-countdown {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+.bank-checkout-qr {
+  text-align: center;
+}
+.bank-checkout .qr-frame {
+  width: 250px;
+  height: 250px;
+  max-width: 100%;
+}
+.bank-checkout .dialog-note {
+  justify-content: center;
+  font-size: 14px;
+}
+.bank-checkout .bank-details > div {
+  flex-wrap: wrap;
+  font-size: 15px;
+}
+.bank-checkout .bank-memo {
+  margin-inline: 0;
+}
+.bank-checkout .bank-memo dd {
+  font-size: 16px;
+  word-break: break-all;
+}
+.bank-checkout .bank-details dd {
+  margin-left: auto;
+}
+.checkout-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+.bank-checkout-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 0;
+  gap: 20px;
+}
+.pending-payments {
+  margin-bottom: 32px;
+}
+.pending-payments h2 {
+  margin-bottom: 12px;
+}
+.pending-payment {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--line);
+  padding: 16px 0;
+  font-size: 14px;
+}
+.pending-payment > span:first-child {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.pending-payment small {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 4px;
 }
 .section-block {
   margin-top: 38px;
@@ -2367,7 +2484,6 @@ input[type="checkbox"] {
   .category-tabs a span,
   .count-label,
   .dialog-note,
-  .tier-grid small,
   .endpoint > span:first-child {
     font-size: 12px;
   }
@@ -2377,7 +2493,6 @@ input[type="checkbox"] {
   .table th,
   .order-meta dt,
   .status-badge,
-  .tier-grid b,
   .price-large small,
   .account-profile p,
   .account-line > span,
@@ -2408,12 +2523,15 @@ input[type="checkbox"] {
   .bank-details dd {
     margin-left: auto;
   }
-  .tier-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .bank-checkout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
   }
-  .tier-grid > div {
-    padding-inline: 6px;
-    overflow-wrap: anywhere;
+  .pending-payment {
+    flex-wrap: wrap;
+  }
+  .pending-payment > span:first-child {
+    flex-basis: calc(100% - 36px);
   }
 }
 @media (max-width: 380px) {

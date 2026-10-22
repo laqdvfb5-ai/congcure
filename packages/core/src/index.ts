@@ -5,6 +5,7 @@ export * from './users';
 export * from './auth';
 export * from './wallet';
 export * from './topup';
+export * from './bank-payments';
 export * from './slug';
 export * from './pricing';
 export * from './catalog';

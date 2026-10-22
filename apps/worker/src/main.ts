@@ -2,6 +2,7 @@ import { closePool } from '@web12/db';
 import { loadEnv } from '@web12/db/node';
 import {
   FULFILL_QUEUE, fulfillApiOrder, getBoss, listStalePendingOrders, stopBoss, type FulfillJobData,
+  expireBankPayments,
 } from '@web12/core';
 
 loadEnv();
@@ -19,6 +20,7 @@ await boss.work<FulfillJobData>(FULFILL_QUEUE, async ([job]) => {
 
 async function sweep() {
   try {
+    await expireBankPayments();
     const ids = await listStalePendingOrders(STALE_AFTER_SECONDS);
     for (const orderId of ids) await boss.send(FULFILL_QUEUE, { orderId } satisfies FulfillJobData);
     if (ids.length) console.log(`sweeper re-enqueued ${ids.length} order(s)`);

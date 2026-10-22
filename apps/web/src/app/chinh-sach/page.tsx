@@ -13,7 +13,7 @@ const policies = [
   {
     icon: PackageCheck,
     title: "Giao hàng tự động",
-    body: "Đơn hàng được xử lý tự động sau khi thanh toán bằng ví. Thông tin tài khoản sẽ hiển thị khi giao hàng hoàn tất. Bạn có thể xem lại trong mục Đơn hàng.",
+    body: "Đơn hàng được xử lý tự động sau khi thanh toán bằng ví hoặc nhận đủ chuyển khoản ngân hàng theo mã thanh toán. Thông tin tài khoản sẽ hiển thị khi giao hàng hoàn tất. Bạn có thể xem lại trong mục Đơn hàng.",
   },
   {
     icon: RotateCcw,
@@ -27,6 +27,10 @@ const policies = [
   },
 ];
 const faq = [
+  [
+    "Thanh toán ngay bằng QR ngân hàng như thế nào?",
+    "Chọn Thanh toán ngay khi mua hàng và chuyển đúng nội dung trên QR. Mã có hiệu lực 15 phút; chỉ xử lý đơn khi nhận đủ tiền. Hàng không được giữ trước khi thanh toán. Tiền dư, giao dịch được ghi nhận sau khi mã hết hạn hoặc khi không thể giao hàng sẽ được ghi nhận vào ví. Khi chuyển thiếu, bạn có thể chuyển thêm theo QR còn thiếu hoặc hủy để nhận số tiền đã chuyển vào ví.",
+  ],
   [
     "Nạp tiền bao lâu thì vào ví?",
     "Tiền thường được ghi nhận sau khi ngân hàng gửi thông báo giao dịch. Giữ đúng nội dung NAP của bạn khi chuyển khoản. Nếu chưa nhận được tiền, liên hệ cửa hàng kèm mã giao dịch.",

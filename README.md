@@ -50,6 +50,18 @@ Tài khoản mẫu:
 - Nội dung chuyển khoản của khách: `NAP<id>`, hiển thị ở trang `/nap-tien`.
 - Giao dịch không khớp được ai sẽ nằm ở `/admin/giao-dich` để admin gán tay.
 
+## Thanh toán trực tiếp bằng ngân hàng
+
+Trang sản phẩm và cửa sổ mua nhanh có hai lựa chọn: thanh toán bằng ví, hoặc thanh toán ngay bằng QR ngân hàng. Giá luôn được tính ở server theo cấp tài khoản; bảng so sánh ba cấp giá không còn hiển thị trên trang sản phẩm.
+
+QR trực tiếp sử dụng mã `DH` riêng cho mỗi thanh toán, có hiệu lực 15 phút và giữ nguyên báo giá. Chỉ tạo đơn khi webhook đã xác thực, khớp mã, khớp tài khoản nhận và nhận đủ tổng tiền. Kho không được giữ trước khi nhận đủ tiền. Các khoản chuyển thiếu được cộng dồn; tiền dư, chuyển muộn, hủy hoặc không còn hàng được ghi nhận vào ví qua sổ cái. Đơn ngân hàng không trừ số dư ví. Đơn API lỗi vẫn hoàn tiền vào ví như đơn ví.
+
+Worker thu hồi các thanh toán hết hạn và trả tiền chuyển thiếu vào ví. Mã giao dịch ngân hàng được chống trùng trong cùng transaction với việc ghi nhận thanh toán và tạo đơn. Hàng đợi lỗi sẽ được stale-order sweeper thử lại. Màn hình `/thanh-toan/<code>` và API trạng thái yêu cầu đúng chủ tài khoản.
+
+Webhook SePay phải nhận cả mã `NAP` (nạp ví) và `DH` (thanh toán đơn). Khi không cấu hình bộ lọc mã trên SePay, server tự phân biệt hai luồng. Nếu bật bộ lọc tiền tố, thêm mẫu `DH` với 16 ký tự chữ/số cùng mẫu `NAP` hiện có.
+
+Triển khai cần chạy migration `002_bank_payments.sql` trước khi khởi động bản web và worker mới. Không dùng webhook giả trên production để thử thanh toán: nó có thể tạo đơn và gọi mua hàng thật. Kiểm tra tự động dùng database test và sản phẩm kho giả.
+
 ## API đại lý
 
 Header `X-API-Key: sk_...`, tạo khóa ở `/tai-khoan`. Giới hạn 60 request/phút.
